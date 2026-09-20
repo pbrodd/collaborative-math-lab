@@ -25,6 +25,10 @@ The mathematical step checker covers exact rational affine equations, literal af
 
 Exercise the checker with equivalent strategies, malformed and nonlinear expressions, negative coefficients, zero divisors, branch loss, contradictory and overlapping constraints, and exact fractions. Exercise persistence and collaboration through separate HTTP sessions: create, join, save, claim, assign, conflict, publish, review, remix, test-play, and access denial. Build for the Sites runtime and inspect the generated migration before publishing.
 
+## Self-hosting
+
+Self-hosting is available as a Docker Compose deployment for a single server, using a persistent SQLite volume and the existing vinext standalone runtime. Hosts may use their own HTTPS reverse proxy or the optional Cloudflare Tunnel overlay. The Workers/D1 build remains supported. The hosting guide covers updates, backups, restoration, room access, and the current browser-session identity model; automated container checks cover collaboration, replacement persistence, proxy behavior, and backup restoration.
+
 ## Future direction: Glyph as a medium for discovery
 
 The user wants Glyph to serve both a functional role in the application and a didactic role for students. The intention is to let students encounter programming through useful mathematical work before introducing programming vocabulary. The owner identified their local Glyph repository; an initial read-only review of checkout `1618e6c` covered its README, tag algebra, embedding proposal, runtime tiers, lexer, and Atlas/Mosaic Wasm hosts. No Glyph source was copied or changed.

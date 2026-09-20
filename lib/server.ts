@@ -1,4 +1,5 @@
 import { scenarioCatalog } from '../scenarios/catalog';
+import { applicationOrigin } from './origin';
 import { validateDocument, ValidationError } from './validation';
 export { validateDocument };
 import { getDatabase, type Database } from '../db';
@@ -66,7 +67,7 @@ export async function identity(request: Request) {
     session,
     cookie: value
       ? undefined
-      : `discovery_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000${new URL(request.url).protocol === 'https:' ? '; Secure' : ''}`,
+      : `discovery_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000${applicationOrigin(request.url).startsWith('https:') ? '; Secure' : ''}`,
   };
 }
 export function reply(data: unknown, cookie?: string, status = 200) {
@@ -86,7 +87,7 @@ export function failure(e: unknown) {
 }
 export async function payload(request: Request): Promise<Record<string, unknown>> {
   const origin = request.headers.get('origin');
-  if (origin && origin !== new URL(request.url).origin)
+  if (origin && origin !== applicationOrigin(request.url))
     throw new ApiError('Make changes from this application.', 403);
   const text = await request.text();
   if (text.length > 250000) throw new ApiError('This update is too large.', 413);

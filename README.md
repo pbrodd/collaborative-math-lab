@@ -38,6 +38,8 @@ _“mathbitch” is another working name. The students still get to choose. The 
 
 ## Run locally
 
+**Have a server with Docker?** See the [Docker and Cloudflare hosting guide](deploy/README.md) for a standalone deployment, persistent storage, HTTPS, and backups.
+
 Use Node.js 24 and npm:
 
 ```sh
@@ -72,7 +74,7 @@ Forking, modifying, sharing, and submitting PRs are welcome under the [MIT licen
 - `lib/algebra.ts` checks affine equations and literal affine formulas, plus univariate absolute-value equations and inequalities with constant denominators. It preserves complete solution sets and rejects unsupported expressions. This is a bounded checker, not a general computer algebra system.
 - `lib/model.ts` resolves named data/role inputs, authors' intended outputs, and scenario checks. `lib/validation.ts` validates the document format.
 - `app/api/books` enforces room membership, role ownership, optimistic revisions, mathematical publication checks, and peer review on the server.
-- D1 stores notebooks, scenario definitions, playthroughs, memberships, contributions, and review history. No student work depends on browser local storage. A display-name preference is device-local.
+- D1 (Workers) or SQLite on a persistent volume (Docker) stores notebooks, scenario definitions, playthroughs, memberships, contributions, and review history. No student work depends on browser local storage. A display-name preference is device-local.
 - An HTTP-only, random session cookie identifies the browser. A room code invites another browser into a specific workbook. Keep the cookie to resume your own memberships; use a room invitation when moving devices. This first release has no account recovery or global public scenario directory.
 - Shared state polls about every three seconds. Concurrent edits produce an explicit conflict and retain the local draft; character-by-character collaborative editing is not implemented.
 - Review feedback remains in history. Editing an input invalidates downstream publications and approvals without deleting their work. A team needs peer-reviewed prerequisites for its combined result; solo players can progress after publishing.
@@ -80,7 +82,7 @@ Forking, modifying, sharing, and submitting PRs are welcome under the [MIT licen
 
 ## Hosting
 
-This project targets Cloudflare Workers through vinext. `.openai/hosting.json` declares the logical D1 binding `DB`; Sites provisions and wires the deployed database. Generated migrations live in `drizzle/` and are included by the build plugin.
+The project supports a [standalone Docker deployment](deploy/README.md), optionally behind Cloudflare Tunnel, and Cloudflare Workers through vinext. Both run the same app and proof receipts. Docker uses SQLite without Cloudflare credentials; Workers uses D1. `.openai/hosting.json` declares the logical D1 binding `DB`; Sites provisions and wires the deployed database. Generated migrations live in `drizzle/` and are included by the build plugin.
 
 If you fork and publish a new Sites instance, remove the original `project_id` from `.openai/hosting.json` while retaining the logical bindings, then create a new site. Do not publish your fork over the original project. Other Cloudflare deployment setups can reuse the Worker output and migrations with their own resource configuration.
 

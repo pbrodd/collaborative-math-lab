@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { applicationOrigin } from '../lib/origin';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();
   const host = h.get('x-forwarded-host') || h.get('host') || 'localhost:3000';
-  const origin = `${host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https'}://${host}`;
+  const origin = applicationOrigin(
+    `${host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https'}://${host}`,
+  );
   return {
     title: 'Untitled · A student discovery lab',
     description:

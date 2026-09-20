@@ -1,0 +1,42 @@
+name: Docker deployment
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COMPOSE_PROJECT_NAME: mathlab-docker-test
+      APP_ORIGIN: https://math.example.test
+      TEST_PUBLIC_ORIGIN: https://math.example.test
+      TEST_STATE_PATH: /tmp/mathlab-persistence.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: docker compose up -d --build --wait --wait-timeout 120
+      - run: node scripts/integration.mjs
+      - run: node scripts/check-self-host.mjs seed
+      - name: Replace the container and check persistent data
+        run: |
+          docker compose up -d --force-recreate --wait --wait-timeout 120
+          node scripts/check-self-host.mjs verify
+      - name: Check online backup and restoration
+        run: |
+          mkdir -p backups
+          docker compose exec -T app node scripts/backup.mjs /data/backup.sqlite
+          docker compose cp app:/data/backup.sqlite backups/math-lab.sqlite
+          docker compose stop app
+          docker compose run --rm --no-deps -v "$PWD/backups:/backup:ro" app node --input-type=module -e '
+            import { copyFileSync, rmSync } from "node:fs";
+            for (const suffix of ["", "-wal", "-shm"]) rmSync("/data/math-lab.sqlite" + suffix, { force: true });
+            copyFileSync("/backup/math-lab.sqlite", "/data/math-lab.sqlite");
+          '
+          docker compose up -d --wait --wait-timeout 120
+          node scripts/check-self-host.mjs verify
+      - if: always()
+        run: docker compose logs --tail=100
+      - if: always()
+        run: docker compose down -v

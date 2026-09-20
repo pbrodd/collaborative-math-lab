@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: process.env.LAB_RUNTIME === 'node' ? 'standalone' : undefined,
 };
 
 export default nextConfig;

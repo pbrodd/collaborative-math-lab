@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 const base = process.env.TEST_BASE_URL || 'http://localhost:3000';
+const origin = process.env.TEST_PUBLIC_ORIGIN || base;
 function client() {
   let cookie = '';
   return async (path, body, method = 'POST', expected = 200) => {
@@ -7,7 +8,7 @@ function client() {
       method: body ? method : 'GET',
       headers: {
         ...(cookie ? { cookie } : {}),
-        ...(body ? { 'Content-Type': 'application/json', Origin: base } : {}),
+        ...(body ? { 'Content-Type': 'application/json', Origin: origin } : {}),
       },
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -299,5 +300,5 @@ console.log(
   '✓ Complete Siege mission, both absolute-value branches, and the final constrained interval',
 );
 console.log(
-  'All integration checks passed. Test workbooks are in the local development database only.',
+  'All integration checks passed. Test workbooks were created on the selected test server.',
 );

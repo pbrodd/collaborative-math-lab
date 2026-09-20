@@ -2,6 +2,7 @@ import vinext from 'vinext';
 import { defineConfig } from 'vite';
 import hostingConfig from './.openai/hosting.json';
 import { sites } from './build/sites-vite-plugin';
+import { fileURLToPath } from 'node:url';
 
 const SITE_CREATOR_PLACEHOLDER_DATABASE_ID = '00000000-0000-4000-8000-000000000000';
 
@@ -33,6 +34,15 @@ const localBindingConfig = {
 };
 
 export default defineConfig(async () => {
+  const nodeRuntime = process.env.LAB_RUNTIME === 'node';
+  const resolve = {
+    alias: {
+      '@lab/database-driver': fileURLToPath(
+        new URL(nodeRuntime ? './db/sqlite.ts' : './db/cloudflare.ts', import.meta.url),
+      ),
+    },
+  };
+  if (nodeRuntime) return { resolve, plugins: [vinext()] };
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= 'false';
@@ -43,6 +53,7 @@ export default defineConfig(async () => {
   const { cloudflare } = await import('@cloudflare/vite-plugin');
 
   return {
+    resolve,
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,

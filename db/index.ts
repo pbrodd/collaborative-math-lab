@@ -1,19 +1,9 @@
-import { env } from 'cloudflare:workers';
-export type SqlResult<T = Record<string, unknown>> = { results: T[]; meta: { changes: number } };
-export interface Statement {
-  bind(...values: unknown[]): Statement;
-  first<T = Record<string, unknown>>(): Promise<T | null>;
-  all<T = Record<string, unknown>>(): Promise<SqlResult<T>>;
-  run(): Promise<SqlResult>;
-}
-export interface Database {
-  prepare(sql: string): Statement;
-  batch(statements: Statement[]): Promise<SqlResult[]>;
-}
+import { runtimeDatabase } from '@lab/database-driver';
+import type { Database } from './types';
+export type { Database, Statement, SqlResult } from './types';
 let initialized: Promise<void> | undefined;
 export async function getDatabase(): Promise<Database> {
-  const db = (env as unknown as { DB: Database }).DB;
-  if (!db) throw new Error('Workbook storage is temporarily unavailable.');
+  const db = runtimeDatabase();
   if (!initialized)
     initialized = db
       .batch([
