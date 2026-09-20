@@ -4,6 +4,8 @@ import { analyze, numberValue } from '../../lib/algebra';
 import {
   auditScenario,
   blankTask,
+  resolveTask,
+  scenarioValues,
   type Book,
   type Cell,
   type Document,
@@ -12,6 +14,7 @@ import {
   type ScenarioTask,
 } from '../../lib/model';
 import { Graph } from './Graph';
+import { ProofPanel } from './ProofPanel';
 import type { Mutation } from './Solver';
 export function DocumentEditor({
   book,
@@ -768,6 +771,7 @@ function ScenarioEditor({
           </p>
           {audits.map((a) => {
             const task = document.tasks.find((t) => t.id === a.id)!;
+            const resolved = resolveTask(task, scenarioValues(document, [], true));
             const mismatch =
               a.kind !== 'literal' &&
               ((task.intent === 'unique' && a.count !== 1) ||
@@ -797,6 +801,13 @@ function ScenarioEditor({
                 </div>
                 <h3>{a.title}</h3>
                 <p>{a.description}</p>
+                {resolved.equation && resolved.intended && (
+                  <ProofPanel
+                    before={resolved.equation}
+                    after={resolved.intended}
+                    constraints={resolved.constraints}
+                  />
+                )}
                 {mismatch && (
                   <p className="feedback-error">
                     This differs from the puzzle type you selected. Revise the problem or change

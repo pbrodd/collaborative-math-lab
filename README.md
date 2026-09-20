@@ -6,6 +6,24 @@ An MIT-licensed learning workspace where students create, remix, solve, and peer
 
 The starting audience is accelerated eighth-grade math, especially equation manipulation, variable isolation, and absolute values. The larger purpose is student ownership: ask a question, model it, show the work, invite review, and build something another team can explore.
 
+## Extremely serious FAQ
+
+**Is mathbitch vibe coded?**
+
+Yes.
+
+**Is mathbitch free?**
+
+Yes, and you can change it however you like.
+
+**Is mathbitch backed by a proof assistant and functional programming language based on a version of the Calculus of Inductive Constructions?**
+
+Yes.
+
+[Lean 4](https://lean-lang.org/theorem_proving_in_lean4/Introduction/). For eighth-grade algebra.
+
+_“mathbitch” is another working name. The students still get to choose. The [MIT license](LICENSE) permits modification and redistribution; retain its copyright and permission notice. “Backed by” means the specific algebra claims checked by our [Lean verification pipeline](verification/README.md), not a proof of the entire app, its prose, or its game models._
+
 ## What you can do
 
 - Keep open notebooks with questions, notes, calculations, numerical graphs, and unfinished ideas.
@@ -16,6 +34,7 @@ The starting audience is accelerated eighth-grade math, especially equation mani
 - Edit the story, supplied information, data, questions, hints, objectives, constraints, role outputs, and intended solutions. Coauthors can join the same scenario room.
 - Audit a puzzle for one solution, several solutions, solution regions, and contradictions. Intentional impossibility is allowed. Test-play creates a separate solver workbook with author answers hidden in the interface.
 - Save and reopen work, export a workbook, and retain creator/source attribution on remixes.
+- Open **Overkill mode** to inspect a formal claim, see an exact matching Lean receipt, or export your own proof candidate. Scenario PRs receive independent Lean checks; the hosted app does not run a live Lean server. See [the verification guide](verification/README.md).
 
 ## Run locally
 

@@ -11,6 +11,7 @@ import {
   type Contribution,
 } from '../../lib/model';
 import { MissionExperiment } from './Graph';
+import { WorkProof } from './ProofPanel';
 export type Mutation = (data: Record<string, unknown>) => Promise<Book>;
 export function MathLine({ text }: { text: string }) {
   return (
@@ -611,6 +612,9 @@ function TaskEditor({
           <summary>Test your prediction</summary>
           <MissionExperiment book={book} />
         </details>
+      )}
+      {task.equation && !unresolved && work.steps.length > 0 && (
+        <WorkProof before={task.equation} constraints={task.constraints} steps={work.steps} />
       )}
       <section className="review-section">
         <div className="section-title">

@@ -516,7 +516,9 @@ export function Studio() {
           </p>
           <small>CHUD · Collaborative Hub for Unhinged Discovery</small>
         </details>
-        <span>CREATE · COLLABORATE · DISCOVER</span>
+        <a href="/verification" target="_blank" rel="noreferrer">
+          How do we know the math is right? ↗
+        </a>
       </footer>
       {toast && (
         <div className="toast" role="status">

@@ -17,3 +17,7 @@ Multiple solutions and contradictory constraints are welcome when intentional. E
 See the README for local setup. Keep equality-preserving steps, exact fractions, branch completeness, and readable feedback central. Significant checker or collaboration changes need behavioral tests. Do not make the checker silently accept unsupported mathematics. The interface should support keyboards and small screens.
 
 Reviews should explain the reasoning behind a change request. Offer a concrete example, check an assumption, or propose an alternative. This project is also a place for students to learn how a technical team works.
+
+## Formal proof checks
+
+Scenario PRs also run **Lean proof checks**. Give every mathematical task an intended solution that describes all solutions, including any constraints and absolute-value branches. Open investigations can omit an equation and remain explicitly uncertified. See [the verification guide](verification/README.md) to reproduce checks, inspect proof artifacts, or contribute more rigorous examples. No Lean installation is required just to submit a scenario PR.

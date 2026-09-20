@@ -50,19 +50,32 @@ test('generates a candidate even for false claims, without claiming proof succes
   assert.match(buildProof({ before: 'x=1', after: 'x=2' }).statement, /↔ \(v_x = \(2 : ℝ\)\)/);
 });
 for (const after of [
-  'x=1/0', 'x=1/(2-2)', 'x=1/x', 'x=x*x', 'x=2^2', 'x==2',
-  'x=1; axiom oops : False', 'x=1\n#eval IO.println "hi"',
-  'x=1 -- trust me', 'x=sorry', 'x=| |x| |', 'x=1000000000000',
+  'x=1/0',
+  'x=1/(2-2)',
+  'x=1/x',
+  'x=x*x',
+  'x=2^2',
+  'x==2',
+  'x=1; axiom oops : False',
+  'x=1\n#eval IO.println "hi"',
+  'x=1 -- trust me',
+  'x=sorry',
+  'x=| |x| |',
+  'x=1000000000000',
   'x=' + '('.repeat(40) + '1' + ')'.repeat(40),
-]) test(`rejects unsupported or executable input: ${after.slice(0, 50)}`, () => {
-  assert.throws(() => buildProof({ before: 'x=1', after }));
-});
+])
+  test(`rejects unsupported or executable input: ${after.slice(0, 50)}`, () => {
+    assert.throws(() => buildProof({ before: 'x=1', after }));
+  });
 test('checks numeric denominator operations before invoking Lean', () => {
   assert.doesNotThrow(() => buildProof({ before: 'x/(2-3)=1', after: 'x=-1' }));
   assert.throws(() => buildProof({ before: 'x/(0*(1/0))=1', after: 'x=1' }));
 });
 test('axiom audit accepts ordinary mathematical foundations', () => {
-  assert.deepEqual(auditAxioms("'claim_0' depends on axioms: [propext, Classical.choice, Quot.sound]", 'claim_0'), ['Classical.choice', 'Quot.sound', 'propext']);
+  assert.deepEqual(
+    auditAxioms("'claim_0' depends on axioms: [propext, Classical.choice, Quot.sound]", 'claim_0'),
+    ['Classical.choice', 'Quot.sound', 'propext'],
+  );
 });
 for (const bad of [
   "'claim_0' depends on axioms: [sorryAx]",
@@ -71,4 +84,6 @@ for (const bad of [
   "'different_claim' depends on axioms: [propext]",
   'Process completed successfully',
   "'claim_0' depends on axioms: [propext]\n'claim_0' depends on axioms: [propext]",
-]) test(`does not issue a receipt for an unaudited proof: ${bad.slice(0, 65)}`, () => assert.throws(() => auditAxioms(bad, 'claim_0')));
+])
+  test(`does not issue a receipt for an unaudited proof: ${bad.slice(0, 65)}`, () =>
+    assert.throws(() => auditAxioms(bad, 'claim_0')));

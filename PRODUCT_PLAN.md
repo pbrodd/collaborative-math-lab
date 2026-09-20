@@ -13,6 +13,9 @@ The students choose the eventual product name. Algebraica and mathchud are provi
 - Author checks distinguish unique solutions, multiple solutions, no solution, and solution regions. Contradictions may be intentional. Unsupported mathematics must be identified rather than guessed.
 - Published role outputs can feed later questions through explicit named references; a changed scenario makes old solver work require review.
 - The two complete introductory missions remain Brawl Stars damage thresholds and Siege arrival timing, using clearly labeled practice data.
+- Optional Overkill mode makes mathematical trust inspectable: preserve complete solution sets, display precise real-number claims, export reproducible Lean proofs, and verify catalog contributions automatically with pinned Lean/Mathlib. Distinguish the quick checker, a kernel-checked exact claim, and human peer review. Unchecked or unsupported claims never receive a formal badge.
+- The hosted release bundles receipts from successful Lean runs. Arbitrary new student work is exported for verification; live native Lean execution is a future isolated-service capability. Formal checks do not certify prose, game data, rounding decisions, or the application itself.
+- The README has a deliberately deadpan FAQ using “mathbitch” as another provisional name. The students retain final naming rights.
 
 ## First release boundaries
 
