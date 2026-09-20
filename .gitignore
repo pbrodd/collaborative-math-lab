@@ -41,3 +41,6 @@ next-env.d.ts
 /outputs/
 /work/
 *.tsbuildinfo
+/verification/.lake/
+/verification/generated/
+/.cache/
