@@ -207,8 +207,12 @@ export function proofDeclaration(statement: string, name = 'algebra_claim'): str
   if (!/^[a-z][a-z0-9_]*$/.test(name)) throw new Error('Invalid theorem name.');
   return `theorem ${name} : ${statement} := by
   intros
-  (try simp only [lab_abs_cases]) <;> (try split_ifs) <;>
-    aesop (config := { enableSimp := false }) (add safe (by linarith))
+  constructor <;> intro h <;> by_contra hn
+  all_goals
+    (try simp only [lab_abs_cases] at h hn) <;>
+      (try split_ifs at h hn) <;> (try push_neg at hn) <;>
+      aesop (config := { enableSimp := false })
+        (add safe (by linarith (config := { splitNe := true })))
 
 #print axioms ${name}
 `;
