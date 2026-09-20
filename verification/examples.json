@@ -1,10 +1,37 @@
 [
   { "id": "linear", "label": "Keep both sides balanced", "before": "3(x-2)=15", "after": "x=7" },
-  { "id": "absolute", "label": "Keep both absolute-value branches", "before": "3|x-4|+2=11", "after": "x=1 or x=7" },
-  { "id": "literal", "label": "Turn a formula around", "before": "d=1800+200u", "after": "u=(d-1800)/200" },
-  { "id": "deadline", "label": "Intersect timing with a deadline", "before": "|x-10|<=3", "constraints": ["x<=11"], "after": "7<=x<=11" },
-  { "id": "impossible", "label": "Prove a puzzle is impossible", "before": "x=2", "constraints": ["x>3"], "after": "no solution" },
-  { "id": "identity", "label": "Every real number works", "before": "2(x+1)=2x+2", "after": "all real numbers" },
+  {
+    "id": "absolute",
+    "label": "Keep both absolute-value branches",
+    "before": "3|x-4|+2=11",
+    "after": "x=1 or x=7"
+  },
+  {
+    "id": "literal",
+    "label": "Turn a formula around",
+    "before": "d=1800+200u",
+    "after": "u=(d-1800)/200"
+  },
+  {
+    "id": "deadline",
+    "label": "Intersect timing with a deadline",
+    "before": "|x-10|<=3",
+    "constraints": ["x<=11"],
+    "after": "7<=x<=11"
+  },
+  {
+    "id": "impossible",
+    "label": "Prove a puzzle is impossible",
+    "before": "x=2",
+    "constraints": ["x>3"],
+    "after": "no solution"
+  },
+  {
+    "id": "identity",
+    "label": "Every real number works",
+    "before": "2(x+1)=2x+2",
+    "after": "all real numbers"
+  },
   { "id": "negative", "label": "Reverse an inequality", "before": "-2x<4", "after": "x>-2" },
   { "id": "decimal", "label": "Decimals are exact fractions", "before": "0.1x=0.3", "after": "x=3" }
 ]
