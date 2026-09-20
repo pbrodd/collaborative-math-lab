@@ -196,6 +196,9 @@ export const LEAN_HEADER = `import Mathlib
 set_option autoImplicit false
 set_option maxHeartbeats 400000
 set_option maxRecDepth 1000
+set_option push_neg.use_distrib true
+set_option linter.unusedTactic false
+set_option linter.unnecessarySeqFocus false
 
 theorem lab_abs_cases (x : ℝ) : |x| = (if 0 ≤ x then x else -x) := by
   split_ifs with h
@@ -211,8 +214,10 @@ export function proofDeclaration(statement: string, name = 'algebra_claim'): str
   all_goals
     (try simp only [lab_abs_cases] at h hn) <;>
       (try split_ifs at h hn) <;> (try push_neg at hn) <;>
-      aesop (config := { enableSimp := false })
-        (add safe (by linarith (config := { splitNe := true })))
+      first
+      | exact hn True.intro
+      | aesop (config := { enableSimp := false })
+          (add safe (by linarith (config := { splitNe := true })))
 
 #print axioms ${name}
 `;
