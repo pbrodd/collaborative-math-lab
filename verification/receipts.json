@@ -2,5 +2,426 @@
   "format": 1,
   "lean": "4.19.0",
   "mathlib": "c44e0c8ee63ca166450922a373c7409c5d26b00b",
-  "claims": []
+  "claims": [
+    {
+      "id": "example:linear",
+      "digest": "15c5541f3175b38e90287c711809165e685e3b4f4d75733ccbb990b43ff700f5",
+      "statement": "∀ (v_x : ℝ), (((3 : ℝ) * (v_x - (2 : ℝ))) = (15 : ℝ)) ↔ (v_x = (7 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "example:absolute",
+      "digest": "f7dfdc7e67e9176879c45179236425dc9f2bee490dfdf13b2766c0138d0287b7",
+      "statement": "∀ (v_x : ℝ), ((((3 : ℝ) * |(v_x - (4 : ℝ))|) + (2 : ℝ)) = (11 : ℝ)) ↔ ((v_x = (1 : ℝ)) ∨ (v_x = (7 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "example:literal",
+      "digest": "3d5814fac455aaffb1a8b11e05bf1974705f4d97c199dd6cf8c691726321eff7",
+      "statement": "∀ (v_d v_u : ℝ), (v_d = ((1800 : ℝ) + ((200 : ℝ) * v_u))) ↔ (v_u = ((v_d - (1800 : ℝ)) / (200 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "example:deadline",
+      "digest": "29a2fb5137cc39bc8a090fbbec7cf89244d14585ebb4102f06604c7ae95ab080",
+      "statement": "∀ (v_x : ℝ), ((|(v_x - (10 : ℝ))| ≤ (3 : ℝ)) ∧ (v_x ≤ (11 : ℝ))) ↔ (((7 : ℝ) ≤ v_x) ∧ (v_x ≤ (11 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "example:impossible",
+      "digest": "bf5cbe093e13914bd8110f2bf0788e3f5002a4ec30b52dd4d938e5f9d680d2d2",
+      "statement": "∀ (v_x : ℝ), ((v_x = (2 : ℝ)) ∧ (v_x > (3 : ℝ))) ↔ False",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "example:identity",
+      "digest": "b3ae4c66d62cae3c0aded3ee852fb51c622a6001db19af1a459634001a570eb5",
+      "statement": "∀ (v_x : ℝ), (((2 : ℝ) * (v_x + (1 : ℝ))) = (((2 : ℝ) * v_x) + (2 : ℝ))) ↔ True",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "example:negative",
+      "digest": "2cdd88427bf4151c374ceb0fcc0da3fba2a3cc06c9e5634cb0a67b871fd37aba",
+      "statement": "∀ (v_x : ℝ), (((-(2 : ℝ)) * v_x) < (4 : ℝ)) ↔ (v_x > (-(2 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "example:decimal",
+      "digest": "36e7148f574a68d2e9711f54c3982257387fdc8b828634385d6ce91905cc2ca7",
+      "statement": "∀ (v_x : ℝ), ((((1 : ℝ) / 10) * v_x) = ((3 : ℝ) / 10)) ↔ (v_x = (3 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:0",
+      "digest": "0766690f0c77e9ddbdbec9233439453c1db387a3bfea8f29c25a2242cd071c6c",
+      "statement": "∀ (v_x : ℝ), (|(v_x - (4 : ℝ))| = (0 : ℝ)) ↔ (v_x = (4 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:1",
+      "digest": "a6d0957cdd67bc611b6407efca022e4a8067938848e8e6a573daea64a28dcdfa",
+      "statement": "∀ (v_x : ℝ), (|(v_x - (4 : ℝ))| = (-(3 : ℝ))) ↔ False",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:2",
+      "digest": "d40cff4b6c6fb7d5d11be779ccb638238ad91d628e4c781d91c0db34a9031f6e",
+      "statement": "∀ (v_x : ℝ), (|v_x| = v_x) ↔ (v_x ≥ (0 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:3",
+      "digest": "0aaa04777dce97fc8e35f38c642598a8f133d10b46034e846f77ac33ab1edd7c",
+      "statement": "∀ (v_x : ℝ), (|v_x| = (-v_x)) ↔ (v_x ≤ (0 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:4",
+      "digest": "dd42415fb0e518411580a8e85c78c58927c4abf5bf55ee7ecba7a8c029ca8f88",
+      "statement": "∀ (v_x : ℝ), (|v_x| < (2 : ℝ)) ↔ (((-(2 : ℝ)) < v_x) ∧ (v_x < (2 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:5",
+      "digest": "465bd29e480f6cf34b0ca6a61db23ab56915f2a802a263fea78694ff6f335c00",
+      "statement": "∀ (v_x : ℝ), (|(v_x - (2 : ℝ))| = |(v_x + (2 : ℝ))|) ↔ (v_x = (0 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:6",
+      "digest": "95eadf6537f32d22de53b4fb950fce85d7d5406ba07b330cf249e32604a0293a",
+      "statement": "∀ (v_x : ℝ), ((v_x / (3 : ℝ)) = ((2 : ℝ) / (7 : ℝ))) ↔ (v_x = ((6 : ℝ) / (7 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:7",
+      "digest": "0190f16658c98ade67219130432da9343e6043e7fb3cea37f43417033e673c1d",
+      "statement": "∀ (v_x : ℝ), ((v_x ≥ (4 : ℝ)) ∧ (v_x < (4 : ℝ))) ↔ False",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:8",
+      "digest": "8c1ba4010377af9c2e48170469dca6fca620746c2c4ea71af0234eb98294174a",
+      "statement": "∀ (v_x : ℝ), ((v_x ≤ (2 : ℝ)) ∨ (v_x ≥ (2 : ℝ))) ↔ True",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:9",
+      "digest": "e5796e090cb39cecaa029f64e100b1c08ffec1fe086c5f0efb26f04214cfaf98",
+      "statement": "∀ (v_x : ℝ), (((3 : ℝ) * (v_x - (2 : ℝ))) = (15 : ℝ)) ↔ ((((3 : ℝ) * v_x) - (6 : ℝ)) = (15 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:10",
+      "digest": "7e975a7ccb4aadd892124c7ac996842c12eb7728774336aba79872995757c943",
+      "statement": "∀ (v_x : ℝ), (((0 : ℝ) * v_x) = (0 : ℝ)) ↔ True",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "regression:11",
+      "digest": "391589a661463f2703da4429e20cd05512d5d5546e4aecbdaa68ef10e5e4352c",
+      "statement": "∀ (v_x : ℝ), (((0 : ℝ) * v_x) = (1 : ℝ)) ↔ False",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:-7:-3",
+      "digest": "780c2069761aa0d1f85029e9d3258a969d3b02f203ddedca75b383aa803a9892",
+      "statement": "∀ (v_x : ℝ), ((((-(7 : ℝ)) * v_x) + (9 : ℝ)) = (30 : ℝ)) ↔ (v_x = (-(3 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:-7:0",
+      "digest": "3dcfd0c99e33092d3bfa9d4aec668a13b9289a2a1649f9e824ff0af9c79459a2",
+      "statement": "∀ (v_x : ℝ), ((((-(7 : ℝ)) * v_x) + (9 : ℝ)) = (9 : ℝ)) ↔ (v_x = (0 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:-7:4",
+      "digest": "ddb113ba7827d054a09e440cfe64c110f0ee380bbe4388f007a0f43c9729e059",
+      "statement": "∀ (v_x : ℝ), ((((-(7 : ℝ)) * v_x) + (9 : ℝ)) = (-(19 : ℝ))) ↔ (v_x = (4 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:-2:-3",
+      "digest": "51d80908501771379e44a4b89b9c95de698a596dd422184b8fceba320735f6a9",
+      "statement": "∀ (v_x : ℝ), ((((-(2 : ℝ)) * v_x) + (9 : ℝ)) = (15 : ℝ)) ↔ (v_x = (-(3 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:-2:0",
+      "digest": "aaab8030b1cff1aa888b4784de848c39353dbe8bd542a649cafc4f9bb0b13b63",
+      "statement": "∀ (v_x : ℝ), ((((-(2 : ℝ)) * v_x) + (9 : ℝ)) = (9 : ℝ)) ↔ (v_x = (0 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:-2:4",
+      "digest": "61cdc9384063901065d611b1d0495a1331c7b6ceb1dba190c925cfbe22e0a382",
+      "statement": "∀ (v_x : ℝ), ((((-(2 : ℝ)) * v_x) + (9 : ℝ)) = (1 : ℝ)) ↔ (v_x = (4 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:1:-3",
+      "digest": "6884ec2b3cd5d5914b7e25ebc31e5e62072f120a154fc0254ccf93cdef32f4fd",
+      "statement": "∀ (v_x : ℝ), ((((1 : ℝ) * v_x) + (9 : ℝ)) = (6 : ℝ)) ↔ (v_x = (-(3 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:1:0",
+      "digest": "65bfe7b62d4b4e8a81c9e444a62b23801bbc83b402bd4b73cad22c96b2650a31",
+      "statement": "∀ (v_x : ℝ), ((((1 : ℝ) * v_x) + (9 : ℝ)) = (9 : ℝ)) ↔ (v_x = (0 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:1:4",
+      "digest": "62391fea2f4b090459f707e2bab95fd176eb6c3b834243c67f167d845108e71c",
+      "statement": "∀ (v_x : ℝ), ((((1 : ℝ) * v_x) + (9 : ℝ)) = (13 : ℝ)) ↔ (v_x = (4 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:5:-3",
+      "digest": "b8f1da638cefa9f697e002fa0829ce5f398bc9a31af9e627eb8e957ac29e4031",
+      "statement": "∀ (v_x : ℝ), ((((5 : ℝ) * v_x) + (9 : ℝ)) = (-(6 : ℝ))) ↔ (v_x = (-(3 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:5:0",
+      "digest": "6a663212ae9b2b5d0dc0d20a2eb01f9d35583f36577af1532e9f6594ee676797",
+      "statement": "∀ (v_x : ℝ), ((((5 : ℝ) * v_x) + (9 : ℝ)) = (9 : ℝ)) ↔ (v_x = (0 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "affine:5:4",
+      "digest": "4137837eeb3cf9232055d2deecf00353ed1aa9d2a00fae6ab2bc3e0cc245af11",
+      "statement": "∀ (v_x : ℝ), ((((5 : ℝ) * v_x) + (9 : ℝ)) = (29 : ℝ)) ↔ (v_x = (4 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:brawl:health",
+      "digest": "b818112d78ed83234566d7d175969711bad4b25bfd5083655b61b202dd5aa7fe",
+      "statement": "∀ (v_h : ℝ), ((v_h - ((2 : ℝ) * (1800 : ℝ))) = (2400 : ℝ)) ↔ (v_h = (6000 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:brawl:shield",
+      "digest": "72d2c6a77ec39a8e13fd0b4b8b5461efce9f2e5751ed4ea0ec9231092f8bfe20",
+      "statement": "∀ (v_r : ℝ), (((1500 : ℝ) * ((1 : ℝ) - v_r)) = (1200 : ℝ)) ↔ (v_r = ((1 : ℝ) / (5 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:brawl:upgrades",
+      "digest": "3d5814fac455aaffb1a8b11e05bf1974705f4d97c199dd6cf8c691726321eff7",
+      "statement": "∀ (v_d v_u : ℝ), (v_d = ((1800 : ℝ) + ((200 : ℝ) * v_u))) ↔ (v_u = ((v_d - (1800 : ℝ)) / (200 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:brawl:combine",
+      "digest": "f57478029bfcd4d2cbac96418a1634d66f0f9ebb693ea253fc1acdb543001010",
+      "statement": "∀ (v_d : ℝ), (((3 : ℝ) * (((1 : ℝ) - ((1 : ℝ) / (5 : ℝ))) * v_d)) = (6000 : ℝ)) ↔ (v_d = (2500 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:brawl:transfer",
+      "digest": "91c3920c9f3d1f8eb573bbe8411801ecc8d6087c675784a8d9414a0be7d2fc6b",
+      "statement": "∀ (v_x : ℝ), (((4 : ℝ) * (v_x - (3 : ℝ))) = (((2 : ℝ) * v_x) + (10 : ℝ))) ↔ (v_x = (11 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:siege:route",
+      "digest": "b199f41123c6bf82ea202b546d980e3f23b92502ed9ef1880a352b418aeec224",
+      "statement": "∀ (v_t : ℝ), (((4 : ℝ) * (v_t + (2 : ℝ))) = (32 : ℝ)) ↔ (v_t = (6 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:siege:arrival",
+      "digest": "b54ee44d7b6138b7286c64080626e5fd2c65ea894b3050c4294f84cdb63c5e4a",
+      "statement": "∀ (v_a : ℝ), ((((3 : ℝ) * v_a) + (6 : ℝ)) = (66 : ℝ)) ↔ (v_a = (20 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:siege:deadline",
+      "digest": "88323f6ae23337072733d8b0b2e736aa70531a020794d3698aa55f4b09a73e7e",
+      "statement": "∀ (v_b : ℝ), ((((2 : ℝ) * v_b) + (8 : ℝ)) = (50 : ℝ)) ↔ (v_b = (21 : ℝ))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:siege:combine",
+      "digest": "1613bc467e757f20c8c2b01f071375f73e91b585411608d2a22898397ae1efa5",
+      "statement": "∀ (v_s : ℝ), (|((v_s + (6 : ℝ)) - (20 : ℝ))| = (2 : ℝ)) ↔ ((v_s = (12 : ℝ)) ∨ (v_s = (16 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    },
+    {
+      "id": "scenario:siege:transfer",
+      "digest": "f7dfdc7e67e9176879c45179236425dc9f2bee490dfdf13b2766c0138d0287b7",
+      "statement": "∀ (v_x : ℝ), ((((3 : ℝ) * |(v_x - (4 : ℝ))|) + (2 : ℝ)) = (11 : ℝ)) ↔ ((v_x = (1 : ℝ)) ∨ (v_x = (7 : ℝ)))",
+      "axioms": [
+        "Classical.choice",
+        "Quot.sound",
+        "propext"
+      ]
+    }
+  ]
 }
