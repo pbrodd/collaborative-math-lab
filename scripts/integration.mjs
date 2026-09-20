@@ -1,0 +1,303 @@
+import assert from 'node:assert/strict';
+const base = process.env.TEST_BASE_URL || 'http://localhost:3000';
+function client() {
+  let cookie = '';
+  return async (path, body, method = 'POST', expected = 200) => {
+    const response = await fetch(base + path, {
+      method: body ? method : 'GET',
+      headers: {
+        ...(cookie ? { cookie } : {}),
+        ...(body ? { 'Content-Type': 'application/json', Origin: base } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const set = response.headers.get('set-cookie');
+    if (set) cookie = set.split(';')[0];
+    const data = await response.json();
+    assert.equal(response.status, expected, `${path}: ${JSON.stringify(data)}`);
+    return data;
+  };
+}
+const alice = client(),
+  bob = client(),
+  outsider = client();
+await alice('/api/books');
+await bob('/api/books');
+await outsider('/api/books');
+let book = (
+  await alice(
+    '/api/books',
+    { action: 'create', kind: 'play', template: 'brawl', playMode: 'team', name: 'Test author' },
+    'POST',
+    201,
+  )
+).book;
+const id = book.id;
+const path = `/api/books/${id}`;
+const joined = (await bob('/api/books', { action: 'join', code: book.code, name: 'Test reviewer' }))
+  .book;
+const aid = book.me,
+  bid = joined.me;
+assert.notEqual(aid, bid);
+assert.equal(joined.members.length, 2);
+await outsider(path, undefined, 'GET', 403);
+async function current(who = alice) {
+  return (await who(path)).book;
+}
+async function claim(task, who = alice, owner = aid) {
+  const b = await current(who),
+    c = b.contributions.find((c) => c.task_id === task);
+  return (await who(path, { action: 'assign', task, owner, revision: c.revision }, 'PATCH')).book;
+}
+function work(equation, answers = {}) {
+  return {
+    steps: [{ equation, reason: 'Applied equivalent operations to both sides.' }],
+    answers,
+    explanation: 'I checked the operations and units; this result fits the supplied data.',
+    hints: 0,
+    mode: 'notebook',
+  };
+}
+async function publish(task, equation, who = alice, answers = {}) {
+  const b = await current(who),
+    c = b.contributions.find((c) => c.task_id === task);
+  return (
+    await who(
+      path,
+      {
+        action: 'publish',
+        task,
+        revision: c.revision,
+        bookRevision: b.revision,
+        work: work(equation, answers),
+      },
+      'PATCH',
+    )
+  ).book;
+}
+async function review(task, who = bob, verdict = 'approve') {
+  const b = await current(who),
+    c = b.contributions.find((c) => c.task_id === task);
+  return (
+    await who(
+      path,
+      {
+        action: 'review',
+        task,
+        revision: c.revision,
+        verdict,
+        note: 'I checked the original equation, both sides, and the meaning of the units.',
+      },
+      'PATCH',
+    )
+  ).book;
+}
+await claim('health');
+await claim('shield', bob, bid);
+await claim('upgrades');
+await claim('combine');
+await publish('health', 'h=6000');
+await publish('shield', 'r=1/5', bob);
+await publish('upgrades', 'u=(d-1800)/200');
+book = await current();
+let row = book.contributions.find((c) => c.task_id === 'combine');
+await alice(
+  path,
+  {
+    action: 'publish',
+    task: 'combine',
+    revision: row.revision,
+    bookRevision: book.revision,
+    work: work('d=2500', { upgrades: '4' }),
+  },
+  'PATCH',
+  400,
+);
+row = book.contributions.find((c) => c.task_id === 'health');
+await alice(
+  path,
+  {
+    action: 'review',
+    task: 'health',
+    revision: row.revision,
+    verdict: 'approve',
+    note: 'I tried to approve my own result while a teammate was here.',
+  },
+  'PATCH',
+  400,
+);
+await review('health');
+await review('shield', alice);
+await review('upgrades');
+await publish('combine', 'd=2500', alice, { upgrades: '4' });
+book = await review('combine');
+assert.equal(book.contributions.find((c) => c.task_id === 'combine').reviewer_id, bid);
+book = await review('health', bob, 'changes');
+assert.equal(book.contributions.find((c) => c.task_id === 'combine').published, 0);
+assert.equal(book.contributions.find((c) => c.task_id === 'health').reviewer_id, null);
+assert.equal(
+  book.contributions.find((c) => c.task_id === 'combine').work.steps.at(-1).equation,
+  'd=2500',
+);
+book = await current();
+row = book.contributions.find((c) => c.task_id === 'health');
+const save = {
+  action: 'save',
+  task: 'health',
+  revision: row.revision,
+  bookRevision: book.revision,
+  work: work('h=6000'),
+};
+await alice(path, save, 'PATCH');
+await alice(path, save, 'PATCH', 409);
+await bob(path, { ...save, revision: row.revision + 1 }, 'PATCH', 403);
+console.log(
+  '✓ Team sessions, role ownership, mathematical publishing, substantive reviews, invalidation, and write conflicts',
+);
+let source = (await alice('/api/books', { action: 'remix', id, name: 'Test author' }, 'POST', 201))
+  .book;
+assert.equal(source.kind, 'scenario');
+assert.equal(source.source.id, id);
+assert.equal(source.creator, 'Test author');
+await bob('/api/books', { action: 'join', code: source.code, name: 'Coauthor' });
+const draft = structuredClone(source.document);
+draft.story = 'A new story authored together.';
+const authorPath = `/api/books/${source.id}`;
+await alice(
+  authorPath,
+  { action: 'document', document: draft, title: 'Coauthored remix', revision: 0 },
+  'PATCH',
+);
+await bob(
+  authorPath,
+  { action: 'document', document: draft, title: 'Stale overwrite', revision: 0 },
+  'PATCH',
+  409,
+);
+assert.equal((await bob(authorPath)).book.title, 'Coauthored remix');
+const testPlay = (
+  await bob('/api/books', { action: 'test', id: source.id, name: 'Solver' }, 'POST', 201)
+).book;
+assert.equal(testPlay.kind, 'play');
+assert.equal(testPlay.source.id, source.id);
+assert.equal((await alice(authorPath)).book.kind, 'scenario');
+console.log(
+  '✓ Collaborative authoring, source attribution, remixing, and separate solver test-play',
+);
+let notebook = (
+  await outsider(
+    '/api/books',
+    { action: 'create', kind: 'notebook', name: 'Notebook author' },
+    'POST',
+    201,
+  )
+).book;
+const notebookPath = `/api/books/${notebook.id}`;
+const doc = {
+  type: 'notebook',
+  cells: [
+    {
+      id: 'question',
+      type: 'question',
+      text: 'What if we change the starting point?',
+      expression: '',
+    },
+    {
+      id: 'graph',
+      type: 'graph',
+      text: 'Compare distances.',
+      expression: 'y=|x-4|',
+      min: -4,
+      max: 10,
+    },
+  ],
+};
+await outsider(
+  notebookPath,
+  { action: 'document', title: 'Unfinished ideas', document: doc, revision: 0 },
+  'PATCH',
+);
+assert.deepEqual((await outsider(notebookPath)).book.document, doc);
+await alice(notebookPath, undefined, 'GET', 403);
+let impossible = (
+  await alice(
+    '/api/books',
+    { action: 'create', kind: 'scenario', name: 'Puzzle maker' },
+    'POST',
+    201,
+  )
+).book;
+const puzzle = impossible.document;
+const t = puzzle.tasks[0];
+Object.assign(t, {
+  title: 'Spot the contradiction',
+  intro: 'Find whether any number satisfies both conditions.',
+  equation: 'x>=4',
+  constraints: ['x<4'],
+  intended: 'no solution',
+  intent: 'none',
+});
+await alice(
+  `/api/books/${impossible.id}`,
+  { action: 'document', title: 'An intentional contradiction', document: puzzle, revision: 0 },
+  'PATCH',
+);
+const play = (
+  await alice(
+    '/api/books',
+    { action: 'test', id: impossible.id, name: 'Puzzle solver' },
+    'POST',
+    201,
+  )
+).book;
+const c = play.contributions[0];
+await alice(
+  `/api/books/${play.id}`,
+  {
+    action: 'publish',
+    task: t.id,
+    revision: c.revision,
+    bookRevision: play.revision,
+    work: work('no solution'),
+  },
+  'PATCH',
+);
+console.log('✓ Durable open notebooks and intentionally contradictory playable puzzles');
+const siege = (
+  await alice(
+    '/api/books',
+    { action: 'create', kind: 'play', template: 'siege', name: 'Timing tester' },
+    'POST',
+    201,
+  )
+).book;
+const sp = `/api/books/${siege.id}`;
+async function siegePublish(task, eq, answers = {}) {
+  const b = (await alice(sp)).book;
+  const c = b.contributions.find((c) => c.task_id === task);
+  return (
+    await alice(
+      sp,
+      {
+        action: 'publish',
+        task,
+        revision: c.revision,
+        bookRevision: b.revision,
+        work: work(eq, answers),
+      },
+      'PATCH',
+    )
+  ).book;
+}
+await siegePublish('route', 't=6');
+await siegePublish('arrival', 'a=20');
+await siegePublish('deadline', 'b=21');
+await siegePublish('combine', 's=12 or s=16', { earliest: '12', latest: '15' });
+const end = (await alice(sp)).book;
+assert.equal(end.contributions.find((c) => c.task_id === 'combine').published, 1);
+console.log(
+  '✓ Complete Siege mission, both absolute-value branches, and the final constrained interval',
+);
+console.log(
+  'All integration checks passed. Test workbooks are in the local development database only.',
+);

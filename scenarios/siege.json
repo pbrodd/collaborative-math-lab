@@ -1,0 +1,210 @@
+{
+  "formatVersion": 1,
+  "id": "siege",
+  "title": "Every second counts",
+  "creator": "Collaborative Math Lab contributors",
+  "license": "MIT",
+  "scenario": {
+    "type": "scenario",
+    "theme": "siege",
+    "story": "Coordinate your arrival with a teammate. Build one plan that satisfies every piece of the team\u2019s evidence.",
+    "information": "A game-inspired timing simulation using supplied rehearsal data. All times start from the same countdown. The final arrival must be within the tolerance and no later than the deadline.",
+    "data": [
+      {
+        "key": "reset",
+        "value": "2",
+        "unit": "sec"
+      },
+      {
+        "key": "route_total",
+        "value": "32",
+        "unit": "sec"
+      },
+      {
+        "key": "teammate_total",
+        "value": "66",
+        "unit": "sec"
+      },
+      {
+        "key": "budget_total",
+        "value": "50",
+        "unit": "sec"
+      },
+      {
+        "key": "tolerance",
+        "value": "2",
+        "unit": "sec"
+      }
+    ],
+    "tasks": [
+      {
+        "kind": "role",
+        "answers": [],
+        "id": "route",
+        "role": "Route analyst",
+        "title": "Measure your travel time",
+        "intro": "Four rehearsal runs take {{route_total}} seconds total. Each includes travel plus a {{reset}}-second reset. Isolate the travel time t.",
+        "equation": "4(t + {{reset}}) = {{route_total}}",
+        "variable": "t",
+        "unit": "seconds",
+        "facts": [
+          {
+            "label": "Rehearsal runs",
+            "value": "4"
+          },
+          {
+            "label": "Reset per run",
+            "value": "2 sec"
+          }
+        ],
+        "hints": [
+          "The parentheses describe one rehearsal: travel plus reset.",
+          "Divide both sides by four to find one rehearsal time.",
+          "Subtract the reset time from both sides."
+        ],
+        "takeaway": "Grouping keeps repeated overhead attached to each run.",
+        "output": "travel",
+        "dependencies": [],
+        "intended": "t = 6",
+        "constraints": [],
+        "intent": "unique"
+      },
+      {
+        "kind": "role",
+        "answers": [],
+        "id": "arrival",
+        "role": "Teammate analyst",
+        "title": "Predict your teammate\u2019s arrival",
+        "intro": "Three identical teammate runs and a one-time 6-second setup take {{teammate_total}} seconds. Find one run time a. The teammate begins at the shared countdown\u2019s zero.",
+        "equation": "3a + 6 = {{teammate_total}}",
+        "variable": "a",
+        "unit": "seconds",
+        "facts": [
+          {
+            "label": "Identical runs",
+            "value": "3"
+          },
+          {
+            "label": "One-time setup",
+            "value": "6 sec"
+          }
+        ],
+        "hints": [
+          "Remove the one-time setup before dividing among the runs.",
+          "Subtract 6 from both sides.",
+          "Divide by 3. That run time is the teammate\u2019s arrival time from the shared zero."
+        ],
+        "takeaway": "One-time overhead and per-run overhead produce different equations.",
+        "output": "arrival",
+        "dependencies": [],
+        "intended": "a = 20",
+        "constraints": [],
+        "intent": "unique"
+      },
+      {
+        "kind": "role",
+        "answers": [],
+        "id": "deadline",
+        "role": "Objective analyst",
+        "title": "Recover the deadline",
+        "intro": "Two equal arrival budgets and an 8-second reset take {{budget_total}} seconds. Find one budget b, the latest allowed arrival.",
+        "equation": "2b + 8 = {{budget_total}}",
+        "variable": "b",
+        "unit": "seconds",
+        "facts": [
+          {
+            "label": "Equal budgets",
+            "value": "2"
+          },
+          {
+            "label": "Reset",
+            "value": "8 sec"
+          }
+        ],
+        "hints": [
+          "The total contains two budgets and one reset.",
+          "Subtract 8 to remove the reset.",
+          "Divide the remaining time by 2 to find b."
+        ],
+        "takeaway": "A deadline becomes a constraint on the plan, not just a number.",
+        "output": "deadline",
+        "dependencies": [],
+        "intended": "b = 21",
+        "constraints": [],
+        "intent": "unique"
+      },
+      {
+        "id": "combine",
+        "role": "Team planning table",
+        "title": "Find every workable start time",
+        "intro": "Use the team\u2019s route, arrival, and deadline results. First find the starts s that give exactly the stated tolerance. Then find the full start interval within that tolerance, while meeting the deadline.",
+        "equation": "|s + {{travel}} - {{arrival}}| = {{tolerance}}",
+        "variable": "s",
+        "unit": "seconds",
+        "kind": "team",
+        "facts": [
+          {
+            "label": "Arrival tolerance",
+            "value": "\u00b12 sec"
+          },
+          {
+            "label": "Route duration",
+            "value": "6 sec"
+          }
+        ],
+        "answers": [
+          {
+            "key": "earliest",
+            "label": "Earliest allowed start",
+            "unit": "sec",
+            "expected": 12
+          },
+          {
+            "key": "latest",
+            "label": "Latest allowed start",
+            "unit": "sec",
+            "expected": 15
+          }
+        ],
+        "hints": [
+          "Absolute value is the distance between the two arrival times. Two starts can be exactly 2 seconds apart.",
+          "After simplifying, open both paths: s \u2212 (a \u2212 6) = 2 or s \u2212 (a \u2212 6) = \u22122. Solve both.",
+          "The endpoints give a whole interval for \u201cwithin.\u201d Also require s + 6 \u2264 b. The deadline may shorten the interval."
+        ],
+        "takeaway": "\u201cExactly\u201d gives boundary points. \u201cWithin\u201d gives an interval. Every constraint must hold.",
+        "output": "combine",
+        "dependencies": ["route", "arrival", "deadline"],
+        "intended": "s = 12 or s = 16",
+        "constraints": [],
+        "intent": "multiple",
+        "answerExpressions": {
+          "earliest": "{{arrival}} - {{travel}} - {{tolerance}}",
+          "latest": "min({{arrival}} - {{travel}} + {{tolerance}},{{deadline}} - {{travel}})"
+        }
+      },
+      {
+        "id": "transfer",
+        "role": "Your independent check",
+        "title": "Two paths, a fresh equation",
+        "intro": "Solve this new equation for every value of x. Isolate the absolute-value expression before opening its paths. Your check is saved separately.",
+        "equation": "3|x - 4| + 2 = 11",
+        "variable": "x",
+        "unit": "",
+        "kind": "transfer",
+        "facts": [],
+        "answers": [],
+        "hints": [
+          "Undo the operations outside the absolute-value bars first.",
+          "Subtract 2, then divide both sides by 3.",
+          "Now |x \u2212 4| = 3. Open the +3 and \u22123 paths and add 4 to each."
+        ],
+        "takeaway": "Keeping both paths preserves the full solution set.",
+        "output": "",
+        "dependencies": [],
+        "intended": "x = 1 or x = 7",
+        "constraints": [],
+        "intent": "multiple"
+      }
+    ]
+  }
+}

@@ -1,0 +1,208 @@
+{
+  "formatVersion": 1,
+  "id": "brawl",
+  "title": "The three-hit question",
+  "creator": "Collaborative Math Lab contributors",
+  "license": "MIT",
+  "scenario": {
+    "type": "scenario",
+    "theme": "brawl",
+    "story": "Your team has three hits. Can you find the smallest upgrade that changes the matchup?",
+    "information": "A game-inspired training simulation. Values and upgrade rules are supplied practice data, not live Brawl Stars stats. Assume every hit lands, with no healing or other modifiers.",
+    "data": [
+      {
+        "key": "hit",
+        "value": "1800",
+        "unit": "damage"
+      },
+      {
+        "key": "remaining",
+        "value": "2400",
+        "unit": "HP"
+      },
+      {
+        "key": "raw",
+        "value": "1500",
+        "unit": "damage"
+      },
+      {
+        "key": "actual",
+        "value": "1200",
+        "unit": "damage"
+      },
+      {
+        "key": "base",
+        "value": "1800",
+        "unit": "damage"
+      },
+      {
+        "key": "gain",
+        "value": "200",
+        "unit": "damage / upgrade"
+      }
+    ],
+    "tasks": [
+      {
+        "kind": "role",
+        "answers": [],
+        "id": "health",
+        "role": "Health analyst",
+        "title": "Reconstruct the health bar",
+        "intro": "Two unshielded hits each deal {{hit}} damage. The target has {{remaining}} health left. Reconstruct its starting health h.",
+        "equation": "h - 2({{hit}}) = {{remaining}}",
+        "variable": "h",
+        "unit": "HP",
+        "facts": [
+          {
+            "label": "Damage per hit",
+            "value": "1,800 HP"
+          },
+          {
+            "label": "Hits landed",
+            "value": "2"
+          }
+        ],
+        "hints": [
+          "How much health did the two unshielded hits remove?",
+          "Combine the two hit amounts before isolating h.",
+          "Add the health lost from both hits to both sides."
+        ],
+        "takeaway": "An equation lets you reconstruct a quantity you could not observe directly.",
+        "output": "health",
+        "dependencies": [],
+        "intended": "h = 6000",
+        "constraints": [],
+        "intent": "unique"
+      },
+      {
+        "kind": "role",
+        "answers": [],
+        "id": "shield",
+        "role": "Shield analyst",
+        "title": "Find what the shield removes",
+        "intro": "A raw hit of {{raw}} deals {{actual}} through the shield. Find the fraction r removed.",
+        "equation": "{{raw}}(1-r) = {{actual}}",
+        "variable": "r",
+        "unit": "fraction",
+        "facts": [
+          {
+            "label": "Raw damage",
+            "value": "1,500 HP"
+          },
+          {
+            "label": "Actual damage",
+            "value": "1,200 HP"
+          }
+        ],
+        "hints": [
+          "The fraction 1 \u2212 r tells you how much gets through.",
+          "Divide both sides by the raw damage, or distribute first.",
+          "After dividing, subtract 1, then divide by \u22121."
+        ],
+        "takeaway": "A reduction of 1/5 means 20% is removed and 80% gets through.",
+        "output": "reduction",
+        "dependencies": [],
+        "intended": "r = 1/5",
+        "constraints": [],
+        "intent": "unique"
+      },
+      {
+        "kind": "role",
+        "answers": [],
+        "id": "upgrades",
+        "role": "Upgrade analyst",
+        "title": "Turn the formula around",
+        "intro": "Our practice upgrades start at {{base}} raw damage and add {{gain}} per upgrade. Isolate u in terms of desired damage d.",
+        "equation": "d = {{base}} + {{gain}}u",
+        "variable": "u",
+        "unit": "upgrades",
+        "facts": [
+          {
+            "label": "Starting damage",
+            "value": "1,800 HP"
+          },
+          {
+            "label": "Per upgrade",
+            "value": "+200 HP"
+          }
+        ],
+        "hints": [
+          "Keep d as a variable. Build a reusable formula.",
+          "Subtract the starting damage from both sides.",
+          "Divide the entire remaining expression by the damage gained per upgrade."
+        ],
+        "takeaway": "The same relationship can answer \u201chow much damage?\u201d or \u201chow many upgrades?\u201d",
+        "output": "upgrade_rule",
+        "dependencies": [],
+        "intended": "u = (d - 1800)/200",
+        "constraints": [],
+        "intent": "unique"
+      },
+      {
+        "id": "combine",
+        "role": "Team planning table",
+        "title": "Find the upgrade that matters",
+        "intro": "Combine the published health and shield results. Find raw damage d so three hits cover the target\u2019s health, then use the upgrade formula. Only whole upgrades can be bought.",
+        "equation": "3((1-{{reduction}})d) = {{health}}",
+        "variable": "d",
+        "unit": "HP per hit",
+        "kind": "team",
+        "facts": [
+          {
+            "label": "Hits available",
+            "value": "3"
+          },
+          {
+            "label": "Damage gets through",
+            "value": "80%"
+          }
+        ],
+        "answers": [
+          {
+            "key": "upgrades",
+            "label": "Minimum whole upgrades",
+            "unit": "upgrades",
+            "expected": 4
+          }
+        ],
+        "hints": [
+          "Use the health and shield results to find raw damage first.",
+          "Three hits deliver 3 \u00d7 0.8 \u00d7 d damage. Divide the health by 2.4.",
+          "Put that damage into u = (d \u2212 1800)/200. If it is fractional, test the next whole upgrade and the one below."
+        ],
+        "takeaway": "A threshold can make one small upgrade change the number of hits needed.",
+        "output": "combine",
+        "dependencies": ["health", "shield", "upgrades"],
+        "intended": "d = 2500",
+        "constraints": [],
+        "intent": "unique",
+        "answerExpressions": {
+          "upgrades": "ceil(({{health}}/(3*(1-{{reduction}}))-{{base}})/{{gain}})"
+        }
+      },
+      {
+        "id": "transfer",
+        "role": "Your independent check",
+        "title": "Take the idea with you",
+        "intro": "A new relationship, without the game data: solve for x. Explain one operation you used. Your work is saved separately from your teammates\u2019 checks.",
+        "equation": "4(x - 3) = 2x + 10",
+        "variable": "x",
+        "unit": "",
+        "kind": "transfer",
+        "facts": [],
+        "answers": [],
+        "hints": [
+          "There are x terms on both sides. Preserve equality as you collect them.",
+          "Distribute 4 to both terms inside the parentheses.",
+          "Subtract 2x from both sides, add 12, then divide by 2."
+        ],
+        "takeaway": "You can carry the same algebraic moves into a new situation.",
+        "output": "",
+        "dependencies": [],
+        "intended": "x = 11",
+        "constraints": [],
+        "intent": "unique"
+      }
+    ]
+  }
+}
