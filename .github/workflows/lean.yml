@@ -21,5 +21,11 @@ jobs:
           test: 'false'
           lint: 'false'
           use-mathlib-cache: 'true'
-      - run: lake env lean Smoke.lean
-        working-directory: verification
+      - run: npm run proofs:check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lean-proof-receipts
+          path: |
+            verification/generated/Claims.lean
+            verification/generated/receipts.json
+            verification/generated/axioms.txt
