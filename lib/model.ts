@@ -54,6 +54,7 @@ export type Review = {
   created_at: number;
 };
 export type Book = {
+  planning?: import('./planning').Planning | null;
   id: string;
   code: string;
   kind: 'notebook' | 'scenario' | 'play';

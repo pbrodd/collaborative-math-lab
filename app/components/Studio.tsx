@@ -6,6 +6,7 @@ import type { Book, Summary } from '../../lib/model';
 import { Solver } from './Solver';
 import { DocumentEditor } from './Editors';
 import { MissionCards } from './MissionCards';
+import { PlanningBoard } from './PlanningBoard';
 type Dialog =
   | { type: 'create'; kind: 'notebook' | 'scenario' | 'play'; template?: string }
   | { type: 'join'; code?: string }
@@ -37,6 +38,10 @@ export function Studio() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [dirty, setDirty] = useState(false);
+  const [boardDirty, setBoardDirty] = useState(false);
+  useEffect(() => {
+    setBoardDirty(false);
+  }, [book?.id]);
   const [filter, setFilter] = useState('all');
   const [toast, setToast] = useState('');
   const refreshBooks = useCallback(async () => {
@@ -87,21 +92,22 @@ export function Studio() {
   }, [book?.id]);
   useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => {
-      if (dirty) {
+      if (dirty || boardDirty) {
         e.preventDefault();
         e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
-  }, [dirty]);
+  }, [dirty, boardDirty]);
   useEffect(() => {
     if (!toast) return;
     const timer = setTimeout(() => setToast(''), 5000);
     return () => clearTimeout(timer);
   }, [toast]);
   const leave = () =>
-    !dirty || window.confirm('Leave unsaved changes? Save your workbook first to keep them.');
+    !(dirty || boardDirty) ||
+    window.confirm('Leave unsaved changes? Save your workbook and board notes first to keep them.');
   const home = () => {
     if (!leave()) return;
     setDirty(false);
@@ -118,6 +124,12 @@ export function Studio() {
   const derive = async (action: 'remix' | 'test') => {
     if (!book) return;
     if (action === 'remix' && !leave()) return;
+    if (
+      action === 'test' &&
+      boardDirty &&
+      !window.confirm('Test-play the saved plan? Unsaved board notes will be left behind.')
+    )
+      return;
     setLoading(true);
     try {
       const result = await api('/api/books', { action, id: book.id, name, playMode: 'solo' });
@@ -140,6 +152,7 @@ export function Studio() {
       creator: book.creator,
       source: book.source,
       document: book.document,
+      planning: book.planning,
       work: book.contributions.map((c) => ({
         task: c.task_id,
         work: c.work,
@@ -494,8 +507,14 @@ export function Studio() {
                 <span> · Created by {book.creator}</span>
               </div>
             )}
+            <PlanningBoard
+              key={`plan:${book.id}`}
+              book={book}
+              mutate={mutate}
+              onDirty={setBoardDirty}
+            />
             {book.document.type === 'scenario' && (
-              <MissionCards key={`cards:${book.id}`} book={book} dirty={dirty} />
+              <MissionCards key={`cards:${book.id}`} book={book} dirty={dirty || boardDirty} />
             )}
             {book.kind === 'play' ? (
               <Solver key={book.id} book={book} mutate={mutate} onDirty={setDirty} />

@@ -60,9 +60,32 @@ if (process.argv[2] === 'seed') {
     }),
   });
   assert.equal(update.status, 200, await update.clone().text());
-  writeFileSync(statePath, JSON.stringify({ id: book.id, me: book.me, cookie, document }), {
-    mode: 0o600,
+  const boardResponse = await fetch(`${base}/api/books/${book.id}`, {
+    method: 'PATCH',
+    headers: { Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'plan-create' }),
   });
+  assert.equal(boardResponse.status, 200);
+  await boardResponse.json();
+  const reviewResponse = await fetch(`${base}/api/books/${book.id}`, {
+    method: 'PATCH',
+    headers: { Cookie: cookie, Origin: origin, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'plan-review',
+      revision: 0,
+      verdict: 'approve',
+      note: 'Retain this reviewed plan through replacement and backup restore.',
+    }),
+  });
+  assert.equal(reviewResponse.status, 200);
+  const planning = (await reviewResponse.json()).book.planning;
+  writeFileSync(
+    statePath,
+    JSON.stringify({ id: book.id, me: book.me, cookie, document, planning }),
+    {
+      mode: 0o600,
+    },
+  );
   console.log(
     '✓ Built pages/assets, storage health, proxy origin, cookie flags, and a saved workbook',
   );
@@ -74,6 +97,7 @@ if (process.argv[2] === 'seed') {
   assert.equal(response.status, 200);
   const book = (await response.json()).book;
   assert.deepEqual(book.document, state.document);
+  assert.deepEqual(book.planning, state.planning);
   assert.equal(book.me, state.me);
   assert.equal(book.isOwner, true);
   console.log('✓ Saved work and creator ownership survived');

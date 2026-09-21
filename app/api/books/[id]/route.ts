@@ -20,6 +20,7 @@ import {
   type Contribution,
   type Scenario,
 } from '../../../../lib/model';
+import { mutatePlanning } from '../../../../lib/planning-storage';
 type Context = { params: Promise<{ id: string }> };
 export async function GET(request: Request, context: Context) {
   try {
@@ -41,6 +42,10 @@ export async function PATCH(request: Request, context: Context) {
     const db = await getDatabase();
     const { book, member } = await authorize(db, id, session);
     const now = Date.now();
+    if (typeof input.action === 'string' && input.action.startsWith('plan-')) {
+      await mutatePlanning(db, id, member.name, input);
+      return reply({ book: await snapshot(db, book, member) }, cookie);
+    }
     if (input.action === 'document') {
       if (book.kind === 'play')
         throw new ApiError(

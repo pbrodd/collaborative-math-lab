@@ -1,6 +1,8 @@
 import { scenarioCatalog } from '../scenarios/catalog';
 import { applicationOrigin } from './origin';
 import { validateDocument, ValidationError } from './validation';
+import { PlanningError } from './planning';
+import { readPlanning, copyPlanning } from './planning-storage';
 export { validateDocument };
 import { getDatabase, type Database } from '../db';
 import { emptyWork, type Work } from './missions';
@@ -76,6 +78,7 @@ export function reply(data: unknown, cookie?: string, status = 200) {
   return Response.json(data, { status, headers });
 }
 export function failure(e: unknown) {
+  if (e instanceof PlanningError) return reply({ error: e.message }, undefined, e.status);
   if (e instanceof ValidationError) return reply({ error: e.message }, undefined, 400);
   if (e instanceof ApiError) return reply({ error: e.message }, undefined, e.status);
   console.error('Workbook request failed', e);
@@ -158,6 +161,7 @@ export async function snapshot(db: Database, book: BookRow, member: MemberRow) {
   ]);
   return {
     ...book,
+    planning: await readPlanning(db, book.id),
     owner: undefined,
     source: book.source ? JSON.parse(book.source) : null,
     document: JSON.parse(book.document),
@@ -283,6 +287,7 @@ export async function createBook(
   ]);
   if (kind === 'play' && document.type === 'scenario')
     await addTasks(db, id, document, memberId, input.playMode === 'team');
+  if (parent) await copyPlanning(db, parent.id, id, name);
   return snapshot(db, book, member);
 }
 export { getDatabase };

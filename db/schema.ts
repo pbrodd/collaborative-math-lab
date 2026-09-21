@@ -54,3 +54,22 @@ export const reviews = sqliteTable('reviews', {
   note: text('note').notNull(),
   createdAt: integer('created_at').notNull(),
 });
+export const planningBoards = sqliteTable('planning_boards', {
+  bookId: text('book_id')
+    .primaryKey()
+    .references(() => books.id),
+  revision: integer('revision').notNull().default(0),
+  document: text('document').notNull(),
+});
+export const planningReviews = sqliteTable('planning_reviews', {
+  id: text('id').primaryKey(),
+  bookId: text('book_id')
+    .notNull()
+    .references(() => books.id),
+  planRevision: integer('plan_revision').notNull(),
+  author: text('author').notNull(),
+  verdict: text('verdict').notNull(),
+  note: text('note').notNull(),
+  document: text('document').notNull(),
+  createdAt: integer('created_at').notNull(),
+});

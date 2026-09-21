@@ -6,7 +6,15 @@ Students make a plan they care about, calculate what must be true for it to work
 
 Available now: saved paper/mission-briefing workbook appearances, existing cooperative scenario authoring and role solving, peer review, and printable/offline mission cards. Cards use the saved scenario and current published findings, omit author answers and independent checks, and carry source attribution, scenario/work revisions, and a snapshot timestamp. Optional question/prediction/falsifier prompts live in the exported card file. A team can record its results in existing notebooks or role discussions.
 
-The canvas, map attachments, per-object collaboration, structured trial records, map thumbnails on cards, and automatic connection from card observations back into a trial are **planned**, not implemented. The present cards are algebra mission briefs with places to write actions and observations; they are not generated route instructions. Existing rooms poll saved state and reject conflicting whole-document edits. They do not synchronize simultaneous drags.
+The **original-map pilot is implemented**. Every workbook can create a Harbor Relay practice board or start without markers/routes on the same original floorplan. Players and objectives can be dragged or moved with keyboard/coordinate controls. Routes have editable waypoints, call-sign assignments, travel/setup estimates, delays, and prerequisites in earlier objective stages. Saves use object revisions; independent changes merge through server retries while conflicting changes retain the local draft. Shared saves poll about every three seconds; drag previews remain local.
+
+The saved schedule checks pairwise readiness spread within each stage and a final deadline. A timing worksheet asks for the complete local delay interval, with Build/Guide/Notebook help and optional Lean candidate export. It holds other arrivals fixed and explicitly asks students to recheck later stages after a change. Times are supplied decimals with millisecond precision, calculated as integers. Geometry does not determine travel time or verify a traversable route. Moving a marker or changing route geometry flags affected timing estimates for review and advances their object revisions. Students acknowledge a rechecked estimate explicitly.
+
+Reviews retain their exact plan snapshot, and earlier reviews remain inspectable after revisions. The current board and archived reviews are included in workbook exports. Remix/test-play copy the current board with reset revisions and no inherited approvals. A separate plan revision avoids invalidating unrelated algebra role work. The board has its own supplied data; it does not automatically substitute existing scenario role outputs into route estimates.
+
+Offline field briefings now include the SVG map, route start cues and readiness times, creator/source attribution, and the Milsymbol license. Existing scenario mission-card packs include these planning-team pages as well. The map is an original design; the friendly-unit SVG comes from a pinned open-source generator.
+
+Alternative map attachments, multiple floors, live cursor/drag broadcasts, graphical waypoint dragging, reviews anchored to individual objects, structured trial records, simulation, and automatic connection from card observations back into a trial are **planned**. Call-sign assignment is an organizational label: any room member can edit a board object, with conflicts checked at save time.
 
 ## The shared planning board
 
@@ -17,7 +25,7 @@ The canvas, map attachments, per-object collaboration, structured trial records,
 - Let objectives depend on earlier objectives. A timeline can replay the mathematical schedule, with a visible distinction between predicted movement and actual gameplay. Never imply that a line animation simulates game mechanics.
 - Attach review comments to routes, equations, assumptions, and measurements. A route or timing change marks affected calculations and schedule approvals as needing review. Keep old plans and trials rather than rewriting their history.
 
-For collaboration, introduce stable IDs and server-checked revisions for individual map objects/operations. Reuse room membership and permissions. Resolve edits to different objects independently; preserve local edits and report a conflict when two members change the same object. Persist completed moves durably; transient drag previews must not be the only record. Role ownership and source attribution remain part of the shared document.
+The pilot uses stable IDs and server-checked revisions for individual map objects, existing room authorization, and durable saves for completed moves. Future live previews should extend that contract. The desired broader board experience above includes capabilities beyond the pilot; refer to the implementation boundary for what is available.
 
 ## The algebra underneath
 
@@ -114,7 +122,7 @@ Scenario generation should validate constraints and candidate plans, test delibe
 ## Suggested delivery order
 
 1. **Completed foundation:** original briefing appearance and printable/offline mission cards using existing saved work, with a paper path for predictions and observations.
-2. **Shared original-map pilot:** role-owned markers, waypoint routes, explicit duration measurements, supported timing equations, stage dependencies, and anchored review. Add individual-object concurrency before calling the canvas live multiplayer.
+2. **Implemented original-map pilot:** shared markers, waypoint routes, supplied duration estimates, supported timing equations, stage dependencies, exact plan review snapshots, and individual-object concurrency. Live drag broadcasts and review anchors on individual objects remain extensions.
 3. **Recorded trials:** prediction snapshots, structured observations, reviewer response, revision comparisons, and cards generated from the actual action plan.
 4. **Optional game backgrounds and extensions:** assets with established permissions, floor transitions, conditional plans, richer scheduling experiments, and a bounded Glyph fact/provenance bridge.
 5. **V2 strategy ladders:** designer benchmark libraries, opt-in optimization prompts, checked feasible plans, model-specific optimality evidence where available, and student strategies that can challenge the benchmarks.

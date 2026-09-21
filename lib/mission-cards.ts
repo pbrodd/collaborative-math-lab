@@ -1,4 +1,6 @@
 import type { Book } from './model';
+import { planningBriefHtml } from './planning-art.ts';
+import type { Planning } from './planning.ts';
 
 export type CardOptions = {
   appearance: 'paper' | 'briefing';
@@ -21,6 +23,7 @@ export type MissionCard = {
   revision: number | null;
 };
 export type CardSet = {
+  planning?: Planning | null;
   title: string;
   creator: string;
   source: string;
@@ -79,6 +82,14 @@ export function missionCardSet(
       };
     });
   return {
+    planning: book.planning
+      ? {
+          plan: structuredClone(book.planning.plan),
+          reviews: book.planning.reviews
+            .filter((r) => r.revision === book.planning!.plan.revision)
+            .map((r) => ({ ...r, plan: structuredClone(book.planning!.plan) })),
+        }
+      : null,
     title: book.title,
     creator: book.creator,
     source: book.source ? `${book.source.title} by ${book.source.creator}` : '',
@@ -134,6 +145,7 @@ export function missionCardsHtml(set: CardSet) {
 </style></head><body class="${set.options.appearance === 'briefing' ? 'briefing' : 'paper'}">
 <div class="toolbar"><h1>${escape(set.title)} · Mission cards</h1><p>Keep this file for offline reference. Print or choose “Save as PDF” in your browser’s print dialog. Cards can be cut along the borders; longer findings may need more space.</p><p class="note">This is a saved snapshot, not a live room. Notes written on paper are not saved to the workbook. Named inputs in {{braces}} still need a published finding. Review labels describe student work, not proof of a game strategy.</p><p class="note"><button id="print-cards" type="button">Print / Save as PDF</button></p></div>
 <main class="sheet">
+${set.planning ? planningBriefHtml(set.planning) : ''}
 <article class="card"><header><span class="kicker">Team briefing / saved snapshot</span><h2>${escape(set.title)}</h2><p>Created by ${escape(set.creator)}</p></header><div class="body">
 ${paragraph('Based on', set.source)}${paragraph('Supplied information', set.information)}
 ${paragraph('Supplied data', set.data.join('\n'))}

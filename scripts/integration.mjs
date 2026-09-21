@@ -318,6 +318,96 @@ assert.equal(end.contributions.find((c) => c.task_id === 'combine').published, 1
 console.log(
   '✓ Complete Siege mission, both absolute-value branches, and the final constrained interval',
 );
+console.log('✓ Existing algebra and notebook workflows passed.');
+await alice(sp, { action: 'plan-create' }, 'PATCH');
+await bob('/api/books', { action: 'join', code: siege.code, name: 'Map reviewer' });
+await outsider(sp, { action: 'plan-create' }, 'PATCH', 403);
+let planned = (await alice(sp)).book;
+const originalPlan = planned.planning.plan;
+await Promise.all([
+  alice(
+    sp,
+    {
+      action: 'plan-edit',
+      kind: 'marker',
+      id: 'alpha',
+      revision: 0,
+      object: { ...originalPlan.markers[0], x: 215 },
+    },
+    'PATCH',
+  ),
+  bob(
+    sp,
+    {
+      action: 'plan-edit',
+      kind: 'marker',
+      id: 'bravo',
+      revision: 0,
+      object: { ...originalPlan.markers[1], y: 445 },
+    },
+    'PATCH',
+  ),
+]);
+planned = (await alice(sp)).book;
+assert.equal(planned.planning.plan.revision, 2);
+assert.equal(planned.planning.plan.markers[0].x, 215);
+assert.equal(planned.planning.plan.markers[1].y, 445);
+assert.equal(planned.planning.plan.routes[0].needsMeasurement, true);
+assert.equal(
+  planned.contributions.find((c) => c.task_id === 'combine').published,
+  1,
+  'the board has separate timing data and revisions',
+);
+await bob(
+  sp,
+  {
+    action: 'plan-edit',
+    kind: 'marker',
+    id: 'alpha',
+    revision: 0,
+    object: originalPlan.markers[0],
+  },
+  'PATCH',
+  409,
+);
+await alice(
+  sp,
+  { action: 'plan-review', revision: 1, verdict: 'approve', note: 'Review of an outdated plan.' },
+  'PATCH',
+  409,
+);
+await bob(
+  sp,
+  {
+    action: 'plan-review',
+    revision: 2,
+    verdict: 'changes',
+    note: 'Measure the revised routes before using these timing estimates.',
+  },
+  'PATCH',
+);
+const revisedSettings = { ...originalPlan.settings, deadline: '15' };
+await alice(
+  sp,
+  { action: 'plan-edit', kind: 'settings', id: 'settings', revision: 0, object: revisedSettings },
+  'PATCH',
+);
+planned = (await bob(sp)).book;
+assert.equal(planned.planning.reviews[0].plan.settings.deadline, '12');
+assert.equal(planned.planning.plan.settings.deadline, '15');
+for (const action of ['remix', 'test']) {
+  const derived = (
+    await alice('/api/books', { action, id: siege.id, name: 'Planner' }, 'POST', 201)
+  ).book;
+  assert.equal(derived.planning.plan.settings.deadline, '15');
+  assert.equal(derived.planning.reviews.length, 0);
+  assert.equal(derived.source.id, siege.id);
+}
+await outsider(notebookPath, { action: 'plan-create', template: 'blank' }, 'PATCH');
+assert.equal((await outsider(notebookPath)).book.planning.plan.markers.length, 0);
+console.log(
+  '✓ Shared boards, independent concurrent edits, conflicts, route-estimate invalidation, reviewed snapshots, and board remix/test-play',
+);
 console.log(
   'All integration checks passed. Test workbooks were created on the selected test server.',
 );

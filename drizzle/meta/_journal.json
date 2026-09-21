@@ -8,6 +8,13 @@
       "when": 1789923980863,
       "tag": "0000_silly_hammerhead",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1789962286723,
+      "tag": "0001_giant_captain_britain",
+      "breakpoints": true
     }
   ]
 }

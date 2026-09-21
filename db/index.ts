@@ -22,6 +22,12 @@ export async function getDatabase(): Promise<Database> {
         db.prepare(
           'CREATE TABLE IF NOT EXISTS reviews (id TEXT PRIMARY KEY,book_id TEXT NOT NULL REFERENCES books(id),task_id TEXT NOT NULL,member_id TEXT NOT NULL,work_revision INTEGER NOT NULL,verdict TEXT NOT NULL,note TEXT NOT NULL,created_at INTEGER NOT NULL)',
         ),
+        db.prepare(
+          'CREATE TABLE IF NOT EXISTS planning_boards (book_id TEXT PRIMARY KEY REFERENCES books(id),revision INTEGER NOT NULL DEFAULT 0,document TEXT NOT NULL)',
+        ),
+        db.prepare(
+          'CREATE TABLE IF NOT EXISTS planning_reviews (id TEXT PRIMARY KEY,book_id TEXT NOT NULL REFERENCES books(id),plan_revision INTEGER NOT NULL,author TEXT NOT NULL,verdict TEXT NOT NULL,note TEXT NOT NULL,document TEXT NOT NULL,created_at INTEGER NOT NULL)',
+        ),
       ])
       .then(() => {})
       .catch((e) => {

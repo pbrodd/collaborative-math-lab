@@ -45,6 +45,8 @@ export function MissionCards({ book, dirty }: { book: Book; dirty: boolean }) {
         <p>
           Make an offline briefing with objectives, assignments, published findings, and space for
           field notes. Author solutions and independent checks stay out of the cards.
+          {book.planning &&
+            ' Your saved map and route action cards are included for the whole planning team.'}
         </p>
         <div className="card-options">
           <label>

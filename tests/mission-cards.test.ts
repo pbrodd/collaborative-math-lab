@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { missionCardSet, missionCardsHtml, type CardOptions } from '../lib/mission-cards.ts';
 import { analyze } from '../lib/algebra.ts';
 import type { Book, Scenario } from '../lib/model.ts';
+import { starterPlan } from '../lib/planning.ts';
 
 const options: CardOptions = {
   appearance: 'briefing',
@@ -126,4 +127,14 @@ test('the planning example intersects a two-second arrival spread with the deadl
   const region = analyze('|s + 6 - 11| <= 2', ['s + 6 <= 12']);
   assert.notEqual(region.kind, 'unsupported');
   assert.equal(region.description, analyze('3 <= s <= 6').description);
+});
+test('mission packs include the current original map and route briefs without private workbook fields', () => {
+  const book = fixture();
+  book.planning = { plan: starterPlan(), reviews: [] };
+  const html = missionCardsHtml(missionCardSet(book, {}, options));
+  assert.match(html, /RELAY STATION/);
+  assert.match(html, /alpha route/);
+  assert.match(html, /Milsymbol/);
+  assert.equal(html.includes(book.code), false);
+  assert.equal(html.includes('SECRET_AUTHOR_ANSWER'), false);
 });
