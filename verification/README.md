@@ -1,6 +1,10 @@
 # The department of completely necessary overkill
 
-This is real Lean 4 verification of specific algebra claims. It is not a formal proof of the whole application, the TypeScript checker, the English story, or the game statistics.
+**The lab is not a general-purpose algebra verifier.** Lean is a general-purpose proof assistant, but our input language and automated proof pipeline support only a deliberately limited subset of school algebra over the real numbers.
+
+This is real Lean 4 verification of specific supported claims. A verified claim does not certify a whole workbook, the application, the TypeScript checker, an English explanation, or the game statistics. It does not establish that every correct claim in the supported subset will be proved automatically.
+
+The supported input includes linear relationships, exact fractions and decimals, division by nonzero constants, non-nested absolute values, inequalities, and bounded combinations of conditions and alternatives. Quadratics and other nonlinear products, division by variables, roots, trigonometry, calculus, and arbitrary prose proofs are outside the current input language. Unsupported expressions, resource limits, and failed proof attempts mean **not verified**, not necessarily **incorrect**.
 
 The lab keeps three distinct kinds of evidence:
 
@@ -8,7 +12,7 @@ The lab keeps three distinct kinds of evidence:
 2. **Lean-verified claim:** an independently parsed statement has a kernel-checked proof and passes our axiom audit. A bundled receipt matches the SHA-256 of that exact generated proof file and its displayed statement.
 3. **Human review:** people assess explanations, units, realism, and whether the equations model the intended question.
 
-The app's **Overkill mode** appears in solver workspaces and scenario audits. The [verification playground](https://collaborative-math-lab.pbrodd.chatgpt.site/verification) has checked examples to edit. A changed or new claim has no Lean badge until its exact proof is checked. It can still be downloaded as a candidate. The hosted Cloudflare Worker does **not** execute Lean or upload student work to GitHub or an external proof service.
+The app's **Overkill mode** appears in solver workspaces and scenario audits. The [verification playground](https://collaborative-math-lab.pbrodd.chatgpt.site/verification) has checked examples to edit. A changed or new claim has no Lean badge until its exact proof is checked. It can still be downloaded as a candidate; generating that file is not verification. Neither the Workers nor Docker deployment executes Lean or uploads student work to GitHub or an external proof service.
 
 ## Reproduce a proof
 

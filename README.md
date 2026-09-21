@@ -22,6 +22,12 @@ Yes.
 
 [Lean 4](https://lean-lang.org/theorem_proving_in_lean4/Introduction/). For eighth-grade algebra.
 
+**Is mathbitch a general-purpose algebra verifier?**
+
+No. The app's automatic checks cover a limited subset of school algebra: linear relationships, exact fractions and decimals, and supported absolute-value equations and inequalities over real numbers. Quadratics, division by variables, trigonometry, calculus, and arbitrary written arguments are outside the current scope. Lean itself is a general-purpose proof assistant; our integration is deliberately limited.
+
+“Lean verified” applies only to the exact displayed claim with its stated conditions and a matching checked receipt. A quick-check result or an exported proof candidate is not a Lean verification. Unsupported input or an unsuccessful proof attempt means **not verified**, not necessarily **incorrect**. See the [verification scope and limits](verification/README.md).
+
 _“mathbitch” is another working name. The students still get to choose. The [MIT license](LICENSE) permits modification and redistribution; retain its copyright and permission notice. “Backed by” means the specific algebra claims checked by our [Lean verification pipeline](verification/README.md), not a proof of the entire app, its prose, or its game models._
 
 ## What you can do

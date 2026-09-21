@@ -14,6 +14,12 @@ export default function VerificationPage() {
       <p className="verification-intro">
         Yes, we brought a research proof assistant to an eighth-grade algebra problem.
       </p>
+      <p>
+        <strong>This lab is not a general-purpose algebra verifier.</strong> Lean is a
+        general-purpose proof assistant, but our automatic checks support only a limited subset of
+        school algebra. A “Lean verified” badge covers the exact displayed claim and its stated
+        conditions.
+      </p>
       <div className="verification-levels">
         <article>
           <span>01</span>
@@ -51,10 +57,12 @@ export default function VerificationPage() {
           solutions.
         </p>
         <p>
-          The current translator handles linear relationships, exact rational constants, constant
-          division, absolute values, inequalities, and “and/or” branches. Unsupported expressions,
-          timeouts, and unfinished proofs never earn a verification badge. A failed proof attempt
-          means “not verified”; it does not by itself mean “false.”
+          The current translator handles linear relationships, exact fractions and decimals,
+          division by nonzero constants, non-nested absolute values, inequalities, and limited
+          “and/or” branches. Quadratics, division by variables, trigonometry, calculus, and
+          arbitrary written arguments are outside its scope. Even a supported, correct claim is not
+          guaranteed an automatic proof. Unsupported expressions, timeouts, and unfinished proofs
+          never earn a verification badge. “Not verified” does not by itself mean “incorrect.”
         </p>
         <p>
           Lean runs in our public contribution checks or on your own computer. The hosted lab looks

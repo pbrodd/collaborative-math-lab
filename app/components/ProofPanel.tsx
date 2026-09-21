@@ -82,6 +82,11 @@ export function ProofPanel({
       </summary>
       <div className="proof-body">
         <p className="proof-lede">Eighth-grade algebra. A rather serious proof assistant.</p>
+        <p className="field-note">
+          This is not a general-purpose algebra verifier. We check supported linear and
+          absolute-value problems; “Lean verified” covers only the exact displayed claim and its
+          stated conditions.
+        </p>
         <p>
           Check that <strong>every solution is preserved</strong>, in both directions, over the real
           numbers. A solution that works is only half the story.
