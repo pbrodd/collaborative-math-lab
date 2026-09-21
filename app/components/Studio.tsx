@@ -7,41 +7,39 @@ import { Solver } from './Solver';
 import { DocumentEditor } from './Editors';
 import { MissionCards } from './MissionCards';
 import { PlanningBoard } from './PlanningBoard';
+import { AccountGate, AccountPanel } from './Accounts';
+import type { Account } from '../../lib/auth';
+import { api } from '../../lib/client-api';
 type Dialog =
   | { type: 'create'; kind: 'notebook' | 'scenario' | 'play'; template?: string }
   | { type: 'join'; code?: string }
   | { type: 'share' }
   | { type: 'name' }
   | null;
-async function api(path: string, body?: Record<string, unknown>, method = 'POST') {
-  const response = await fetch(path, {
-    method: body ? method : 'GET',
-    headers: body ? { 'Content-Type': 'application/json' } : undefined,
-    body: body ? JSON.stringify(body) : undefined,
-    cache: 'no-store',
-  });
-  let data;
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error('The workspace could not connect. Please try again.');
-  }
-  if (!response.ok) throw new Error(data.error || 'That request could not be completed.');
-  return data;
-}
 export function Studio() {
+  return (
+    <AccountGate>
+      {(account, update) => <Workspace key={account.id} account={account} onAccount={update} />}
+    </AccountGate>
+  );
+}
+function Workspace({
+  account,
+  onAccount,
+}: {
+  account: Account;
+  onAccount: (result: { user: Account | null; recoveryCode?: string }) => void;
+}) {
+  const [accountOpen, setAccountOpen] = useState(false);
   const [books, setBooks] = useState<Summary[]>([]);
   const [book, setBook] = useState<Book | null>(null);
   const [dialog, setDialog] = useState<Dialog>(null);
-  const [name, setName] = useState('Explorer');
+  const [name, setName] = useState(account.name);
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [dirty, setDirty] = useState(false);
   const [boardDirty, setBoardDirty] = useState(false);
-  useEffect(() => {
-    setBoardDirty(false);
-  }, [book?.id]);
   const [filter, setFilter] = useState('all');
   const [toast, setToast] = useState('');
   const refreshBooks = useCallback(async () => {
@@ -54,6 +52,8 @@ export function Studio() {
     setError('');
     try {
       const data = await api(`/api/books/${encodeURIComponent(id)}`);
+      setDirty(false);
+      setBoardDirty(false);
       setBook(data.book);
       history.replaceState(null, '', `?book=${id}`);
     } catch (e) {
@@ -63,23 +63,33 @@ export function Studio() {
     }
   }, []);
   useEffect(() => {
-    try {
-      setName(localStorage.getItem('discovery_display_name') || 'Explorer');
-    } catch {}
-    refreshBooks().catch((e) => {
-      setError(e.message);
-      setReady(true);
-    });
-    const q = new URLSearchParams(window.location.search);
-    if (q.get('book')) open(q.get('book')!);
-    else if (q.get('join')) setDialog({ type: 'join', code: q.get('join')! });
-  }, [refreshBooks, open]);
+    let active = true;
+    api('/api/books')
+      .then((data) => {
+        if (!active) return;
+        setBooks(data.books);
+        setReady(true);
+        const q = new URLSearchParams(window.location.search);
+        if (q.get('book')) void open(q.get('book')!);
+        else if (q.get('join')) setDialog({ type: 'join', code: q.get('join')! });
+      })
+      .catch((e) => {
+        if (active) {
+          setError(e.message);
+          setReady(true);
+        }
+      });
+    return () => {
+      active = false;
+    };
+  }, [open]);
+  const bookId = book?.id;
   useEffect(() => {
-    if (!book) return;
+    if (!bookId) return;
     let active = true;
     const timer = setInterval(async () => {
       try {
-        const data = await api(`/api/books/${book.id}`);
+        const data = await api(`/api/books/${bookId}`);
         if (active) setBook(data.book);
       } catch {
         if (active) setToast('Connection paused. Your open draft is still here.');
@@ -89,7 +99,7 @@ export function Studio() {
       active = false;
       clearInterval(timer);
     };
-  }, [book?.id]);
+  }, [bookId]);
   useEffect(() => {
     const warn = (e: BeforeUnloadEvent) => {
       if (dirty || boardDirty) {
@@ -109,11 +119,13 @@ export function Studio() {
     !(dirty || boardDirty) ||
     window.confirm('Leave unsaved changes? Save your workbook and board notes first to keep them.');
   const home = () => {
-    if (!leave()) return;
+    if (!leave()) return false;
     setDirty(false);
+    setBoardDirty(false);
     setBook(null);
     history.replaceState(null, '', '/');
     refreshBooks().catch((e) => setError(e.message));
+    return true;
   };
   const mutate = async (data: Record<string, unknown>): Promise<Book> => {
     if (!book) throw new Error('Open a workbook first.');
@@ -134,6 +146,7 @@ export function Studio() {
     try {
       const result = await api('/api/books', { action, id: book.id, name, playMode: 'solo' });
       setDirty(false);
+      setBoardDirty(false);
       setBook(result.book);
       history.replaceState(null, '', `?book=${result.book.id}`);
       refreshBooks().catch(() => {});
@@ -145,6 +158,13 @@ export function Studio() {
   };
   const exportBook = () => {
     if (!book) return;
+    if (dirty || boardDirty) {
+      setError(
+        'Save your workbook, role work, and board notes before exporting. The export includes saved work only.',
+      );
+      return;
+    }
+    setError('');
     const payload = {
       format: 'discovery-workbook',
       version: 1,
@@ -197,7 +217,7 @@ export function Studio() {
           </button>
           <button
             onClick={() => {
-              home();
+              if (!home()) return;
               setTimeout(
                 () =>
                   document.getElementById('my-workbooks')?.scrollIntoView({ behavior: 'smooth' }),
@@ -212,14 +232,16 @@ export function Studio() {
           <button
             className="button secondary small"
             disabled={!ready}
-            onClick={() => setDialog({ type: 'join' })}
+            onClick={() => {
+              if (leave()) setDialog({ type: 'join' });
+            }}
           >
             Join a room ↗
           </button>
           <button
             className="profile-button"
-            onClick={() => setDialog({ type: 'name' })}
-            aria-label="Choose your display name"
+            onClick={() => setAccountOpen(true)}
+            aria-label="Account settings"
           >
             {name.slice(0, 1).toUpperCase()}
           </button>
@@ -548,6 +570,17 @@ export function Studio() {
           {toast}
         </div>
       )}
+      {accountOpen && (
+        <AccountPanel
+          user={account}
+          canLeave={leave}
+          onClose={() => setAccountOpen(false)}
+          onUpdate={(result) => {
+            if (result.user) setName(result.user.name);
+            onAccount(result);
+          }}
+        />
+      )}
       {dialog && (
         <DialogView
           dialog={dialog}
@@ -556,12 +589,10 @@ export function Studio() {
           onClose={() => setDialog(null)}
           onName={(n) => {
             setName(n);
-            try {
-              localStorage.setItem('discovery_display_name', n);
-            } catch {}
           }}
           onCreated={(b) => {
             setDirty(false);
+            setBoardDirty(false);
             setBook(b);
             history.replaceState(null, '', `?book=${b.id}`);
             setDialog(null);

@@ -1,5 +1,8 @@
 import { scenarioCatalog } from '../scenarios/catalog';
 import { applicationOrigin } from './origin';
+import { ApiError } from './api-error';
+import { requireUser } from './auth';
+export { ApiError };
 import { validateDocument, ValidationError } from './validation';
 import { PlanningError } from './planning';
 import { readPlanning, copyPlanning } from './planning-storage';
@@ -13,14 +16,6 @@ import {
   type Scenario,
   type Attribution,
 } from './model';
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status = 400,
-  ) {
-    super(message);
-  }
-}
 export type BookRow = {
   id: string;
   code: string;
@@ -53,28 +48,13 @@ export type WorkRow = {
   updated_at: number;
 };
 export async function identity(request: Request) {
-  const value = request.headers
-    .get('cookie')
-    ?.match(/(?:^|;\s*)discovery_session=([a-f0-9]{64})(?:;|$)/)?.[1];
-  const token =
-    value ||
-    Array.from(crypto.getRandomValues(new Uint8Array(32)), (x) =>
-      x.toString(16).padStart(2, '0'),
-    ).join('');
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(token));
-  const session = Array.from(new Uint8Array(digest), (x) => x.toString(16).padStart(2, '0')).join(
-    '',
-  );
-  return {
-    session,
-    cookie: value
-      ? undefined
-      : `discovery_session=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000${applicationOrigin(request.url).startsWith('https:') ? '; Secure' : ''}`,
-  };
+  const user = await requireUser(await getDatabase(), request);
+  return { session: user.id, cookie: undefined };
 }
-export function reply(data: unknown, cookie?: string, status = 200) {
-  const headers: Record<string, string> = { 'Cache-Control': 'no-store' };
-  if (cookie) headers['Set-Cookie'] = cookie;
+export function reply(data: unknown, cookie?: string | string[], status = 200) {
+  const headers = new Headers({ 'Cache-Control': 'no-store' });
+  for (const value of typeof cookie === 'string' ? [cookie] : (cookie ?? []))
+    headers.append('Set-Cookie', value);
   return Response.json(data, { status, headers });
 }
 export function failure(e: unknown) {

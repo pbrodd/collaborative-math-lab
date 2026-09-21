@@ -7,6 +7,7 @@ services:
     init: true
     environment:
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:3000}
+      AUTH_SETUP_TOKEN: ${AUTH_SETUP_TOKEN:-}
     ports:
       - '${BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-3000}:3000'
     volumes:

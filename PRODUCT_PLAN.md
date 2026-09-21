@@ -24,7 +24,7 @@ The students choose the eventual product name. Algebraica and mathchud are provi
 
 ## First release boundaries
 
-The mathematical step checker covers exact rational affine equations, literal affine formulas, and univariate absolute-value equations and inequalities with constant denominators. It is not a general computer algebra system. Freeform prose is saved, not automatically certified. Graphs are numerical explorations. Shared rooms synchronize by polling. Browser sessions identify participants without collecting student email addresses. Site access policy controls who can reach the application; room codes then control access to each shared workbook.
+The mathematical step checker covers exact rational affine equations, literal affine formulas, and univariate absolute-value equations and inequalities with constant denominators. It is not a general computer algebra system. Freeform prose is saved, not automatically certified. Graphs are numerical explorations. Shared rooms synchronize by polling. Invite-only username/password accounts identify participants across devices without collecting student email addresses. One-use recovery codes restore access and revoke existing sessions. Site access policy controls who can reach the application; room codes then control access to each shared workbook.
 
 ## Validation
 
@@ -32,7 +32,7 @@ Exercise the checker with equivalent strategies, malformed and nonlinear express
 
 ## Self-hosting
 
-Self-hosting is available as a Docker Compose deployment for a single server, using a persistent SQLite volume and the existing vinext standalone runtime. Hosts may use their own HTTPS reverse proxy or the optional Cloudflare Tunnel overlay. The Workers/D1 build remains supported. The hosting guide covers updates, backups, restoration, room access, and the current browser-session identity model; automated container checks cover collaboration, replacement persistence, proxy behavior, and backup restoration.
+Self-hosting is available as a Docker Compose deployment for a single server, using a persistent SQLite volume and the existing vinext standalone runtime. Hosts may use their own HTTPS reverse proxy or the optional Cloudflare Tunnel overlay. The Workers/D1 build remains supported. The hosting guide covers updates, backups, restoration, room access, and account setup, invitations, and recovery; automated container checks cover collaboration, replacement persistence, proxy behavior, and backup restoration.
 
 ## Future direction: Glyph as a medium for discovery
 

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { createTestAccount } from './test-accounts.mjs';
 
 const base = process.env.TEST_BASE_URL || 'http://localhost:3000';
 const origin = process.env.TEST_PUBLIC_ORIGIN || base;
@@ -26,18 +27,17 @@ if (process.argv[2] === 'seed') {
     body: JSON.stringify({ action: 'create', kind: 'notebook' }),
   });
   assert.equal(rejected.status, 403, 'cross-origin writes are rejected');
+  const { cookie, setCookie } = await createTestAccount();
   const response = await fetch(`${base}/api/books`, {
     method: 'POST',
-    headers: { Origin: origin, 'Content-Type': 'application/json' },
+    headers: { Origin: origin, 'Content-Type': 'application/json', Cookie: cookie },
     body: JSON.stringify({ action: 'create', kind: 'notebook', name: 'Persistence tester' }),
   });
   assert.equal(response.status, 201, await response.clone().text());
-  const setCookie = response.headers.get('set-cookie');
   assert.match(setCookie, /HttpOnly/);
   assert.match(setCookie, /SameSite=Lax/);
   assert.equal(setCookie.includes('; Secure'), origin.startsWith('https:'));
   const book = (await response.json()).book;
-  const cookie = setCookie.split(';')[0];
   const document = {
     type: 'notebook',
     cells: [

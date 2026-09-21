@@ -1,10 +1,11 @@
+import Link from 'next/link';
 import { ProofPlayground } from '../components/ProofPanel';
 export default function VerificationPage() {
   return (
     <main className="verification-page">
-      <a className="text-button" href="/">
+      <Link className="text-button" href="/">
         ← Back to the lab
-      </a>
+      </Link>
       <span className="eyebrow">THE DEPARTMENT OF COMPLETELY NECESSARY OVERKILL</span>
       <h1>
         Trust the work.

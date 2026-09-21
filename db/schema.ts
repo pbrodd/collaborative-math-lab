@@ -1,4 +1,66 @@
-import { sqliteTable, text, integer, uniqueIndex, primaryKey } from 'drizzle-orm/sqlite-core';
+import {
+  sqliteTable,
+  text,
+  integer,
+  uniqueIndex,
+  primaryKey,
+  index,
+  check,
+} from 'drizzle-orm/sqlite-core';
+import { sql } from 'drizzle-orm';
+
+export const authUsers = sqliteTable(
+  'auth_users',
+  {
+    id: text('id').primaryKey(),
+    username: text('username').notNull().unique(),
+    name: text('name').notNull(),
+    passwordHash: text('password_hash').notNull(),
+    recoveryHash: text('recovery_hash').notNull(),
+    credentialVersion: integer('credential_version').notNull().default(0),
+    role: text('role').notNull(),
+    createdAt: integer('created_at').notNull(),
+  },
+  (t) => [check('auth_user_role', sql`${t.role} IN ('admin','student')`)],
+);
+export const authSessions = sqliteTable(
+  'auth_sessions',
+  {
+    tokenHash: text('token_hash').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => authUsers.id),
+    credentialVersion: integer('credential_version').notNull(),
+    expiresAt: integer('expires_at').notNull(),
+  },
+  (t) => [index('auth_session_user').on(t.userId)],
+);
+export const authInvites = sqliteTable('auth_invites', {
+  tokenHash: text('token_hash').primaryKey(),
+  createdBy: text('created_by')
+    .notNull()
+    .references(() => authUsers.id),
+  label: text('label').notNull(),
+  createdAt: integer('created_at').notNull(),
+  expiresAt: integer('expires_at').notNull(),
+  usedBy: text('used_by').references(() => authUsers.id),
+  revoked: integer('revoked').notNull().default(0),
+});
+export const authSetup = sqliteTable(
+  'auth_setup',
+  {
+    id: integer('id').primaryKey(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => authUsers.id),
+  },
+  (t) => [check('auth_setup_singleton', sql`${t.id}=1`)],
+);
+export const authLimits = sqliteTable('auth_limits', {
+  bucket: text('bucket').primaryKey(),
+  attempts: integer('attempts').notNull(),
+  startedAt: integer('started_at').notNull(),
+});
 export const books = sqliteTable('books', {
   id: text('id').primaryKey(),
   code: text('code').notNull().unique(),

@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
+import { createTestAccount } from './test-accounts.mjs';
 const base = process.env.TEST_BASE_URL || 'http://localhost:3000';
 const origin = process.env.TEST_PUBLIC_ORIGIN || base;
-function client() {
-  let cookie = '';
+async function client() {
+  let { cookie } = await createTestAccount();
   return async (path, body, method = 'POST', expected = 200) => {
     const response = await fetch(base + path, {
       method: body ? method : 'GET',
@@ -19,9 +20,10 @@ function client() {
     return data;
   };
 }
-const alice = client(),
-  bob = client(),
-  outsider = client();
+const alice = await client(),
+  bob = await client(),
+  outsider = await client();
+assert.equal((await fetch(base + '/api/books')).status, 401, 'workbooks require sign-in');
 await alice('/api/books');
 await bob('/api/books');
 await outsider('/api/books');

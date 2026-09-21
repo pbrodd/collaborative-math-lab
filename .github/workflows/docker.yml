@@ -11,6 +11,8 @@ jobs:
       APP_ORIGIN: https://math.example.test
       TEST_PUBLIC_ORIGIN: https://math.example.test
       TEST_STATE_PATH: /tmp/mathlab-persistence.json
+      AUTH_SETUP_TOKEN: ci-only-disposable-test-server-setup-token
+      TEST_SETUP_TOKEN: ci-only-disposable-test-server-setup-token
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

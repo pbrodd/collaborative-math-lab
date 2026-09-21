@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { equivalent, transform } from '../../lib/algebra';
-import { emptyWork, type HelpMode, type Work } from '../../lib/missions';
+import { type HelpMode, type Work } from '../../lib/missions';
 import {
   assessTask,
   resolveTask,
@@ -56,6 +56,12 @@ function SolverInner({
   const [selected, setSelected] = useState(scenario.tasks[0].id);
   const [dirty, setDirty] = useState(false);
   const [panel, setPanel] = useState<'work' | 'team'>('work');
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    const tick = () => setNow(Date.now());
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, []);
   const task = scenario.tasks.find((t) => t.id === selected) || scenario.tasks[0];
   const contribution = workFor(book, task);
   const values = scenarioValues(scenario, book.contributions, false, book.revision);
@@ -163,9 +169,19 @@ function SolverInner({
                   {m.name}
                   {m.id === book.me ? ' (you)' : ''}
                 </b>
-                <small>{Date.now() - m.last_seen < 20000 ? 'Here now' : 'Away for now'}</small>
+                <small>
+                  {now === null
+                    ? 'Checking presence…'
+                    : now - m.last_seen < 20000
+                      ? 'Here now'
+                      : 'Away for now'}
+                </small>
               </span>
-              <i className={Date.now() - m.last_seen < 20000 ? 'presence online' : 'presence'} />
+              <i
+                className={
+                  now !== null && now - m.last_seen < 20000 ? 'presence online' : 'presence'
+                }
+              />
             </div>
           ))}
         </div>
@@ -196,9 +212,10 @@ function TaskEditor({
   mutate: Mutation;
   onDirty: (v: boolean) => void;
 }) {
-  const [work, setWork] = useState<Work>(() => structuredClone(contribution.work));
-  const [base, setBase] = useState(contribution.revision);
-  const [dirty, setDirty] = useState(false);
+  const [draft, setDraft] = useState<{ work: Work; base: number } | null>(null);
+  const work = draft?.work ?? contribution.work;
+  const base = draft?.base ?? contribution.revision;
+  const dirty = draft !== null;
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -212,15 +229,8 @@ function TaskEditor({
   const current = work.steps.at(-1)?.equation || task.equation;
   const checked = assessTask(task, work);
   const changedRemotely = base !== contribution.revision && dirty;
-  useEffect(() => {
-    if (!dirty) {
-      setWork(structuredClone(contribution.work));
-      setBase(contribution.revision);
-    }
-  }, [contribution, dirty]);
   const edit = (patch: Partial<Work>) => {
-    setWork((w) => ({ ...w, ...patch }));
-    setDirty(true);
+    setDraft({ work: { ...work, ...patch }, base });
     onDirty(true);
     setMessage('');
     setError('');
@@ -238,7 +248,7 @@ function TaskEditor({
     setBusy(true);
     setError('');
     try {
-      const updated = await mutate({
+      await mutate({
         action,
         task: definition.id,
         revision: action === 'save' || action === 'publish' ? base : contribution.revision,
@@ -247,13 +257,8 @@ function TaskEditor({
         ...extra,
       });
       if (action === 'save' || action === 'publish') {
-        setDirty(false);
+        setDraft(null);
         onDirty(false);
-        const saved = workFor(updated, definition);
-        if (saved) {
-          setBase(saved.revision);
-          setWork(saved.work);
-        }
         setMessage(
           action === 'publish' ? 'Published. Your reasoning is ready for review.' : 'Draft saved.',
         );
@@ -584,10 +589,9 @@ function TaskEditor({
           <button
             className="text-button"
             onClick={() => {
-              setDirty(false);
+              if (!window.confirm('Replace your unsaved draft with the saved version?')) return;
+              setDraft(null);
               onDirty(false);
-              setBase(contribution.revision);
-              setWork(structuredClone(contribution.work));
             }}
           >
             Load saved version

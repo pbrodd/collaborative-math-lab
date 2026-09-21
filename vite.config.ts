@@ -33,7 +33,7 @@ const localBindingConfig = {
     : [],
 };
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ command }) => {
   const nodeRuntime = process.env.LAB_RUNTIME === 'node';
   const resolve = {
     alias: {
@@ -62,7 +62,14 @@ export default defineConfig(async () => {
       sites(),
       cloudflare({
         viteEnvironment: { name: 'rsc', childEnvironments: ['ssr'] },
-        config: localBindingConfig,
+        config: {
+          ...localBindingConfig,
+          // Forward only the local setup key during development. Never embed
+          // a host environment secret into a production Worker artifact.
+          ...(command === 'serve' && process.env.AUTH_SETUP_TOKEN
+            ? { vars: { AUTH_SETUP_TOKEN: process.env.AUTH_SETUP_TOKEN } }
+            : {}),
+        },
       }),
     ],
   };

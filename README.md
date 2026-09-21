@@ -55,12 +55,16 @@ Use Node.js 24 and npm:
 
 ```sh
 npm ci
+export AUTH_SETUP_TOKEN="$(openssl rand -hex 32)"
+printf 'Host setup key: %s\n' "$AUTH_SETUP_TOKEN"
 npm run dev
 ```
 
+Keep the printed setup key private. The initial setup form uses it to create the host account. See [accounts and invitations](docs/accounts.md).
+
 Open the Local URL printed by the server (normally `http://localhost:3000`). The vinext/Vite development environment runs the Cloudflare-compatible Worker and a local D1 database. The application creates its tables on first use; the corresponding Drizzle migration is checked in. Local development data stays in ignored `.wrangler/` state.
 
-No AI API key is required. Mathematical checks are deterministic and use exact rational arithmetic. Display names are nicknames; the app does not ask students for email addresses.
+No AI API key is required. Mathematical checks are deterministic and use exact rational arithmetic. Accounts use invite-only usernames and passwords, with one-use recovery codes. Display names can be nicknames; the app does not ask students for email addresses.
 
 ## Checks
 
@@ -68,10 +72,13 @@ No AI API key is required. Mathematical checks are deterministic and use exact r
 npm test
 npm run scenarios:check
 npm run typecheck
+npm run lint
 npm run build
+npx playwright install chromium
+npm run test:browser
 ```
 
-With the development server running, `npm run test:integration` checks separate HTTP sessions, room joins, ownership, persistence, mathematical publishing, peer review, revision invalidation, write conflicts, open notebooks, remix attribution, test-play, and both starting missions. These tests create local development workbooks. Use `TEST_BASE_URL` only against an appropriate test environment.
+With a disposable development server running and `TEST_SETUP_TOKEN` set to its `AUTH_SETUP_TOKEN`, `npm run test:integration` checks separate HTTP sessions, room joins, ownership, persistence, mathematical publishing, peer review, revision invalidation, write conflicts, open notebooks, remix attribution, test-play, and both starting missions. These tests create test accounts and workbooks. Browser tests build a standalone app with an isolated temporary database. For an already initialized HTTP test server, supply `TEST_ADMIN_USERNAME` and `TEST_ADMIN_PASSWORD` if you changed the default test host credentials. Use `TEST_BASE_URL` only against an appropriate test environment.
 
 ## Add a scenario through a pull request
 
@@ -85,8 +92,8 @@ Forking, modifying, sharing, and submitting PRs are welcome under the [MIT licen
 - `lib/algebra.ts` checks affine equations and literal affine formulas, plus univariate absolute-value equations and inequalities with constant denominators. It preserves complete solution sets and rejects unsupported expressions. This is a bounded checker, not a general computer algebra system.
 - `lib/model.ts` resolves named data/role inputs, authors' intended outputs, and scenario checks. `lib/validation.ts` validates the document format.
 - `app/api/books` enforces room membership, role ownership, optimistic revisions, mathematical publication checks, and peer review on the server.
-- D1 (Workers) or SQLite on a persistent volume (Docker) stores notebooks, scenario definitions, playthroughs, memberships, contributions, and review history. No student work depends on browser local storage. A display-name preference is device-local.
-- An HTTP-only, random session cookie identifies the browser. A room code invites another browser into a specific workbook. Keep the cookie to resume your own memberships; use a room invitation when moving devices. This first release has no account recovery or global public scenario directory.
+- D1 (Workers) or SQLite on a persistent volume (Docker) stores notebooks, scenario definitions, playthroughs, memberships, contributions, and review history. No student work depends on browser local storage. Account settings and display names are server-backed.
+- Invite-only accounts identify students across browsers. HTTP-only session cookies expire after 14 days; signing in restores workbook access. One-use recovery codes reset forgotten passwords and revoke existing sessions. Workbook room codes remain separate from account invitations. See [account setup and recovery](docs/accounts.md). There is no global public scenario directory.
 - Shared state polls about every three seconds. Board mutations check individual object revisions and retry independent concurrent saves against the latest plan. Same-object conflicts retain the local draft. Notebook/scenario document edits still use whole-document conflicts. Character-by-character editing and live cursor/drag broadcasts are not implemented.
 - `lib/planning.ts` evaluates a small supplied schedule using exact integer milliseconds, pairwise stage spread, deadlines, and earlier-stage prerequisites. The algebra worksheet holds other arrivals fixed; the full schedule must be checked after changing a delay. It does not derive travel times from map geometry, check walls/visibility/player occupancy, or optimize routes. Milsymbol SVG artwork is generated at development time from a pinned MIT-licensed package; see [asset provenance](ASSET_PROVENANCE.md).
 - Review feedback remains in history. Editing an input invalidates downstream publications and approvals without deleting their work. A team needs peer-reviewed prerequisites for its combined result; solo players can progress after publishing.

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { analyze, numberValue } from '../../lib/algebra';
 import {
   auditScenario,
@@ -27,23 +27,18 @@ export function DocumentEditor({
   onDirty: (v: boolean) => void;
   onTest: () => Promise<void>;
 }) {
-  const [document, setDocument] = useState<Document>(() => structuredClone(book.document));
-  const [title, setTitle] = useState(book.title);
-  const [base, setBase] = useState(book.revision);
-  const [dirty, setDirty] = useState(false);
+  const [draft, setDraft] = useState<{ document: Document; title: string; base: number } | null>(
+    null,
+  );
+  const document = draft?.document ?? book.document;
+  const title = draft?.title ?? book.title;
+  const base = draft?.base ?? book.revision;
+  const dirty = draft !== null;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-  useEffect(() => {
-    if (!dirty) {
-      setDocument(structuredClone(book.document));
-      setTitle(book.title);
-      setBase(book.revision);
-    }
-  }, [book.document, book.title, book.revision, dirty]);
   function edit(next: Document) {
-    setDocument(next);
-    setDirty(true);
+    setDraft({ document: next, title, base });
     onDirty(true);
     setMessage('');
   }
@@ -51,10 +46,8 @@ export function DocumentEditor({
     setBusy(true);
     setError('');
     try {
-      const result = await mutate({ action: 'document', document, title, revision: base });
-      setDocument(result.document);
-      setBase(result.revision);
-      setDirty(false);
+      await mutate({ action: 'document', document, title, revision: base });
+      setDraft(null);
       onDirty(false);
       setMessage('Saved for the whole crew.');
       return true;
@@ -81,8 +74,7 @@ export function DocumentEditor({
             value={title}
             maxLength={100}
             onChange={(e) => {
-              setTitle(e.target.value);
-              setDirty(true);
+              setDraft({ document, title: e.target.value, base });
               onDirty(true);
             }}
           />
@@ -140,11 +132,8 @@ export function DocumentEditor({
             className="text-button"
             onClick={() => {
               if (window.confirm('Replace your unsaved draft with the shared version?')) {
-                setDirty(false);
+                setDraft(null);
                 onDirty(false);
-                setDocument(structuredClone(book.document));
-                setTitle(book.title);
-                setBase(book.revision);
               }
             }}
           >

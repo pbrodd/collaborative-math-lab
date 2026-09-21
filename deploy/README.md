@@ -10,10 +10,11 @@ You need Docker Engine with Compose v2, a hostname, and an HTTPS reverse proxy o
 git clone https://github.com/pbrodd/collaborative-math-lab.git
 cd collaborative-math-lab
 cp deploy/env.example .env
+# Edit .env: set APP_ORIGIN and a private AUTH_SETUP_TOKEN (openssl rand -hex 32).
 docker compose up -d --build --wait
 ```
 
-For a local trial, open `http://localhost:3000`. For a server, edit `.env` first: set `APP_ORIGIN=https://math.your-domain.example` to the exact public origin, without a path. Configure HTTPS using one of the options below. Keep the same origin to preserve browser sessions.
+For a local trial, open `http://localhost:3000`. For a server, edit `.env` first: set `APP_ORIGIN=https://math.your-domain.example` to the exact public origin, without a path. Configure HTTPS using one of the options below. Generate `AUTH_SETUP_TOKEN` with `openssl rand -hex 32` and save it privately in `.env`. Open the app, enter that key to create the host account, save the recovery code, and invite students from Account settings. Remove the setup token from `.env` after setup and recreate the app container. See [accounts and recovery](../docs/accounts.md). A later domain change requires signing in again; accounts and work remain in the database.
 
 The image builds from the checked-out source with the npm lockfile. It runs as the unprivileged `node` user, with a read-only application filesystem. `/data` holds SQLite, `/tmp` is disposable, and logs go to Docker with rotation. The image health check calls `/api/health`, which checks database availability. The runtime does not install dependencies or download proof tools at startup.
 
@@ -94,18 +95,18 @@ docker compose build --pull
 docker compose up -d --wait
 ```
 
-For reproducible releases, deploy a selected commit or tag and set `IMAGE_TAG` accordingly. Roll back by checking out the previous commit and rebuilding. If an update changes the database schema, consult its release notes and restore the matching backup when required. Current tables are initialized automatically on first use; future schema changes need explicit migration handling.
+For reproducible releases, deploy a selected commit or tag and set `IMAGE_TAG` accordingly. Roll back by checking out the previous commit and rebuilding. If an update changes the database schema, consult its release notes and restore the matching backup when required. Tables, including the additive account migration, are initialized automatically on first use. Backups now include account credentials and sessions as well as student work. After an account upgrade, do not run an older anonymous-access release against the upgraded database: account-owned rooms require the new authorization rules. Restore a matching pre-upgrade backup when rolling back.
 
 ## What testers should know
 
 - Create a workbook or choose a starting mission, then share the room code with teammates. Display names can be nicknames; no email account is required.
-- Membership is tied to an HTTP-only cookie in that browser. Clearing cookies loses that browser identity; an invitation code can join again but does not restore creator ownership. Account recovery is not implemented.
+- Membership belongs to the signed-in account. Clearing cookies or changing devices requires signing in again. Save the one-use recovery code to reset a forgotten password. Create accounts in existing browsers before clearing legacy cookies to claim their saved work on this same database.
 - Keep one app replica per database volume. SQLite's local storage is intended for this single-server deployment, not several hosts sharing a network filesystem.
 - Overkill mode includes the same Lean-checked examples and downloadable proof candidates. It does not execute arbitrary Lean submissions on your server. CI remains responsible for checking catalog contributions.
 - Remix attribution records the source workbook and supplied creator name. It is not cryptographic proof of an author's identity. Lean verifies the displayed mathematical claim, not the story's real-world data or the entire application.
 
 ## Cloudflare Workers instead of a VPS
 
-The original `npm run dev` and `npm run build` still target Workers with D1. `.openai/hosting.json` belongs to the existing Sites deployment; do not reuse its project ID to publish another instance. A deployment directly into your own Cloudflare account needs its own Worker configuration and D1 binding named `DB`, plus the `drizzle/` migrations. Docker is the ready-to-run independent deployment described here; no VPS or Cloudflare resources are created by cloning or building the repository.
+The original `npm run dev` and `npm run build` still target Workers with D1. `.openai/hosting.json` belongs to the existing Sites deployment; do not reuse its project ID to publish another instance. A deployment directly into your own Cloudflare account needs its own Worker configuration and D1 binding named `DB`, plus the `drizzle/` migrations and a runtime `AUTH_SETUP_TOKEN` for first setup. Docker is the ready-to-run independent deployment described here; no VPS or Cloudflare resources are created by cloning or building the repository.
 
 For contributors, `npm run build:node` creates `dist/standalone/`, and `npm run start:node` runs it without Docker. Set `DATABASE_PATH` to choose the SQLite file and `APP_ORIGIN` for proxy hosting. Each build target writes `dist/`; build the desired target before packaging it.

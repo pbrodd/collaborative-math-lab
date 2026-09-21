@@ -14,6 +14,7 @@ WORKDIR /app
 RUN mkdir /data && chown node:node /data
 COPY --from=build --chown=node:node /app/dist/standalone/ ./
 COPY --chown=node:node scripts/backup.mjs ./scripts/backup.mjs
+COPY --chown=node:node scripts/account-recovery.mjs ./scripts/account-recovery.mjs
 COPY --chown=node:node LICENSE ./LICENSE
 USER node
 EXPOSE 3000

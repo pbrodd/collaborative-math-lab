@@ -1,4 +1,5 @@
 import { runtimeDatabase } from '@lab/database-driver';
+import { authSchema } from './auth-schema';
 import type { Database } from './types';
 export type { Database, Statement, SqlResult } from './types';
 let initialized: Promise<void> | undefined;
@@ -7,6 +8,7 @@ export async function getDatabase(): Promise<Database> {
   if (!initialized)
     initialized = db
       .batch([
+        ...authSchema.map((sql) => db.prepare(sql)),
         db.prepare(
           'CREATE TABLE IF NOT EXISTS books (id TEXT PRIMARY KEY,code TEXT NOT NULL UNIQUE,kind TEXT NOT NULL,title TEXT NOT NULL,creator TEXT NOT NULL,owner TEXT NOT NULL,source TEXT,document TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 0,created_at INTEGER NOT NULL,updated_at INTEGER NOT NULL)',
         ),

@@ -9,7 +9,6 @@ import {
   timingQuestion,
   milliseconds,
   seconds,
-  type PlanRoute,
 } from '../lib/planning.ts';
 import { analyze } from '../lib/algebra.ts';
 import { planningSvg, planningDocument } from '../lib/planning-art.ts';
