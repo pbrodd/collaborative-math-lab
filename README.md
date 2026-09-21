@@ -40,6 +40,8 @@ _“mathbitch” is another working name. The students still get to choose. The 
 - Edit the story, supplied information, data, questions, hints, objectives, constraints, role outputs, and intended solutions. Coauthors can join the same scenario room.
 - Audit a puzzle for one solution, several solutions, solution regions, and contradictions. Intentional impossibility is allowed. Test-play creates a separate solver workbook with author answers hidden in the interface.
 - Save and reopen work, export a workbook, and retain creator/source attribution on remixes.
+- Choose paper or an original mission-briefing appearance for notebooks and scenarios; the saved choice carries into remixes and test-play.
+- Prepare **Mission cards** from a saved scenario or playthrough: the whole team or a single role, published findings with review status, and prediction/observation cards. Open the print sheet to print or save as PDF, or download standalone HTML for offline use. Optional experiment prompts are saved in the downloaded artifact, not the workbook; record match results in a notebook or role discussion. Cards exclude author solutions, unpublished work, independent checks, and room invitations.
 - Open **Overkill mode** to inspect a formal claim, see an exact matching Lean receipt, or export your own proof candidate. Scenario PRs receive independent Lean checks; the hosted app does not run a live Lean server. See [the verification guide](verification/README.md).
 
 ## Run locally
@@ -95,3 +97,5 @@ If you fork and publish a new Sites instance, remove the original `project_id` f
 Site access and room access are separate. The site's hosting policy determines who can reach the app; room codes then determine which workbook they may join. Creating a public GitHub repository does not change a deployed site's access policy.
 
 See [PRODUCT_PLAN.md](PRODUCT_PLAN.md) for the accepted product direction and [ASSET_PROVENANCE.md](ASSET_PROVENANCE.md) for the generated social-preview asset.
+
+The next design connects [shared map planning, match experiments, and mission artifacts](docs/mission-planning.md). The shared blueprint canvas and structured trial records are planned; they are not part of the current card export. No Ubisoft blueprint assets are bundled. Download availability does not establish redistribution permission; third-party artwork needs its own applicable license or permission and is not covered by this repository's MIT license.

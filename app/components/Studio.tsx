@@ -5,6 +5,7 @@ import { missions } from '../../lib/missions';
 import type { Book, Summary } from '../../lib/model';
 import { Solver } from './Solver';
 import { DocumentEditor } from './Editors';
+import { MissionCards } from './MissionCards';
 type Dialog =
   | { type: 'create'; kind: 'notebook' | 'scenario' | 'play'; template?: string }
   | { type: 'join'; code?: string }
@@ -492,6 +493,9 @@ export function Studio() {
                 by {book.source.creator}
                 <span> · Created by {book.creator}</span>
               </div>
+            )}
+            {book.document.type === 'scenario' && (
+              <MissionCards key={`cards:${book.id}`} book={book} dirty={dirty} />
             )}
             {book.kind === 'play' ? (
               <Solver key={book.id} book={book} mutate={mutate} onDirty={setDirty} />

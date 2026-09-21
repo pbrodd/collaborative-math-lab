@@ -163,6 +163,7 @@ assert.equal(source.creator, 'Test author');
 await bob('/api/books', { action: 'join', code: source.code, name: 'Coauthor' });
 const draft = structuredClone(source.document);
 draft.story = 'A new story authored together.';
+draft.appearance = 'briefing';
 const authorPath = `/api/books/${source.id}`;
 await alice(
   authorPath,
@@ -176,11 +177,28 @@ await bob(
   409,
 );
 assert.equal((await bob(authorPath)).book.title, 'Coauthored remix');
+assert.equal((await bob(authorPath)).book.document.appearance, 'briefing');
+await alice(
+  authorPath,
+  {
+    action: 'document',
+    document: { ...draft, appearance: 'unknown' },
+    title: 'Invalid style',
+    revision: 1,
+  },
+  'PATCH',
+  400,
+);
 const testPlay = (
   await bob('/api/books', { action: 'test', id: source.id, name: 'Solver' }, 'POST', 201)
 ).book;
 assert.equal(testPlay.kind, 'play');
 assert.equal(testPlay.source.id, source.id);
+assert.equal(testPlay.document.appearance, 'briefing');
+const styledRemix = (
+  await bob('/api/books', { action: 'remix', id: source.id, name: 'Remixer' }, 'POST', 201)
+).book;
+assert.equal(styledRemix.document.appearance, 'briefing');
 assert.equal((await alice(authorPath)).book.kind, 'scenario');
 console.log(
   '✓ Collaborative authoring, source attribution, remixing, and separate solver test-play',
@@ -196,6 +214,7 @@ let notebook = (
 const notebookPath = `/api/books/${notebook.id}`;
 const doc = {
   type: 'notebook',
+  appearance: 'briefing',
   cells: [
     {
       id: 'question',

@@ -13,6 +13,92 @@
   --display: 'Manrope', sans-serif;
   --mono: 'SFMono-Regular', Consolas, monospace;
 }
+.workbook-appearance {
+  min-width: 170px;
+}
+.briefing-workbook .document-title,
+.briefing-workbook .mission-nav {
+  background: #263c34;
+  color: #faf8e9;
+  border-top: 6px solid #b6be91;
+  padding: 24px;
+}
+.briefing-workbook .document-title .eyebrow,
+.briefing-workbook .mission-nav > .eyebrow,
+.briefing-workbook .mission-nav > p,
+.briefing-workbook .mission-nav > small {
+  color: #e0e4c9;
+}
+.briefing-workbook .title-input {
+  background: #faf8e9;
+  color: #263c34;
+  padding: 8px 12px;
+  margin-top: 12px;
+}
+.briefing-workbook .title-input,
+.briefing-workbook .mission-nav > h2 {
+  font-family: var(--mono);
+  letter-spacing: -0.03em;
+}
+.briefing-workbook .document-title .button.secondary,
+.briefing-workbook .mission-nav > .button.secondary {
+  background: #faf8e9;
+  color: #263c34;
+}
+.briefing-workbook .task-nav.active {
+  color: #263c34;
+}
+.briefing-workbook .task-nav:not(.active) small,
+.briefing-workbook .mission-assumptions,
+.briefing-workbook .mission-assumptions summary {
+  color: #e0e4c9;
+}
+.briefing-workbook .mission-assumptions code {
+  color: #263c34;
+}
+.mission-cards-panel {
+  margin: 18px 0 26px;
+  border: 1px solid #cbd6c7;
+  border-radius: 10px;
+  background: #fffefa;
+}
+.mission-cards-panel > summary {
+  padding: 16px 20px;
+  font-weight: 700;
+}
+.mission-cards-panel > summary span {
+  font-weight: 400;
+  margin-left: 14px;
+  color: #53695e;
+}
+.mission-cards-body {
+  padding: 4px 20px 22px;
+}
+.mission-cards-body > p {
+  max-width: 85ch;
+}
+.card-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: 18px;
+  margin: 20px 0;
+}
+.card-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0 12px;
+}
+@media (max-width: 650px) {
+  .mission-cards-panel > summary span {
+    display: block;
+    margin: 4px 0 0;
+  }
+  .briefing-workbook .document-title,
+  .briefing-workbook .mission-nav {
+    padding: 18px;
+  }
+}
 * {
   box-sizing: border-box;
 }

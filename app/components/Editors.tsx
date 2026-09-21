@@ -66,7 +66,9 @@ export function DocumentEditor({
     }
   }
   return (
-    <div className="document-layout">
+    <div
+      className={`document-layout ${document.appearance === 'briefing' ? 'briefing-workbook' : ''}`}
+    >
       <div className="document-title">
         <div>
           <span className="eyebrow">
@@ -86,6 +88,18 @@ export function DocumentEditor({
           />
         </div>
         <div className="document-actions">
+          <label className="workbook-appearance">
+            Workbook style
+            <select
+              value={document.appearance || 'paper'}
+              onChange={(e) =>
+                edit({ ...document, appearance: e.target.value as 'paper' | 'briefing' })
+              }
+            >
+              <option value="paper">Paper notebook</option>
+              <option value="briefing">Mission briefing</option>
+            </select>
+          </label>
           <span className={`status ${dirty ? 'draft' : ''}`}>
             {dirty ? 'Unsaved changes' : 'Saved'}
           </span>

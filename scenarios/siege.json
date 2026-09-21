@@ -6,6 +6,7 @@
   "license": "MIT",
   "scenario": {
     "type": "scenario",
+    "appearance": "briefing",
     "theme": "siege",
     "story": "Coordinate your arrival with a teammate. Build one plan that satisfies every piece of the team\u2019s evidence.",
     "information": "A game-inspired timing simulation using supplied rehearsal data. All times start from the same countdown. The final arrival must be within the tolerance and no later than the deadline.",

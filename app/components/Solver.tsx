@@ -73,7 +73,9 @@ function SolverInner({
     setPanel('work');
   };
   return (
-    <div className="solver-layout">
+    <div
+      className={`solver-layout ${scenario.appearance === 'briefing' ? 'briefing-workbook' : ''}`}
+    >
       <aside className="mission-nav">
         <span className="eyebrow">YOUR MISSION</span>
         <h2>{book.title.replace(' · playthrough', '')}</h2>

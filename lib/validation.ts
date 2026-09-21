@@ -3,6 +3,8 @@ export class ValidationError extends Error {}
 export function validateDocument(value: unknown): Document {
   if (!value || typeof value !== 'object') throw new ValidationError('A document is required.');
   const d = value as Document;
+  if (d.appearance !== undefined && !['paper', 'briefing'].includes(d.appearance))
+    throw new ValidationError('Choose the paper or mission briefing appearance.');
   if (d.type === 'notebook') {
     if (
       !Array.isArray(d.cells) ||

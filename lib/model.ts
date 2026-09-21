@@ -19,13 +19,18 @@ export type ScenarioTask = Task & {
 };
 export type Scenario = {
   type: 'scenario';
+  appearance?: 'paper' | 'briefing';
   story: string;
   theme: 'brawl' | 'siege' | 'original';
   information: string;
   data: { key: string; value: string; unit: string }[];
   tasks: ScenarioTask[];
 };
-export type Notebook = { type: 'notebook'; cells: Cell[] };
+export type Notebook = {
+  type: 'notebook';
+  appearance?: 'paper' | 'briefing';
+  cells: Cell[];
+};
 export type Document = Scenario | Notebook;
 export type Member = { id: string; name: string; last_seen: number };
 export type Contribution = {
