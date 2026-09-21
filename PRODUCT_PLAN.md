@@ -55,3 +55,11 @@ Keep tile and text representations visibly connected. Do not promise arbitrary t
 Preserve student authorship, version history, attribution, peer review, and the existing Build/Guide/Notebook modes. Treat executable workbook content as untrusted and design bounded, isolated execution once the runtime is known. Lean should certify explicit mathematical claims within a documented supported subset; a verified algebra statement must never be presented as proof that an arbitrary Glyph program is correct. A future language-to-proof bridge needs its own semantics, tests, and visible trust boundary.
 
 This is a planned direction, not an implemented Glyph runtime or a decision to replace the current algebra notation.
+
+## V2: Self Service
+
+Evaluate Glyph's **Mosaic** and **Skirmish** machinery for student-authored game simulations. The owner identifies existing wargame-simulation capabilities in these projects as especially relevant. Review the current implementations in `~/source/repos/glyph` before designing a new simulation engine; the earlier Glyph survey is not a completed audit of their simulation capabilities.
+
+The intended student workflow is to create or remix a playable world, define roles and objectives, supply rules and data, run experiments, compare strategies, and share the scenario with its sources and authorship intact. Explore whether Mosaic/Skirmish can support that workflow and the [strategy ladders](docs/mission-planning.md#v2-strategy-ladders-and-optimization). This is a discovery item for V2, not a commitment to specific unreviewed APIs or a shipped integration.
+
+Before implementation, map the actual supported simulation primitives, embedding/runtime interface, scenario format, replay behavior, provenance, and licensing. Check which capabilities fit student-authored scenarios and what execution limits are needed. Keep simulation results, mathematical checks, empirical match observations, and formal proof claims visibly distinct. Students should be able to reach the underlying Glyph as an optional learning step after using the authoring tools.
