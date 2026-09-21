@@ -1,6 +1,6 @@
 // A deliberately bounded, exact checker for affine algebra and absolute values.
 // No eval, floating-point sampling, or language-model grading.
-type Q = { n: bigint; d: bigint };
+export type Q = { n: bigint; d: bigint };
 const z = BigInt(0),
   o = BigInt(1);
 function gcd(a: bigint, b: bigint): bigint {
@@ -360,11 +360,16 @@ export function equivalent(original: string, next: string): { valid: boolean; me
   }
 }
 export function numberValue(s: string): number {
-  const a = affine(parse(s));
-  if (!isConstant(a)) throw new Error('Enter a number or fraction.');
-  const v = a.get('') || q(0);
+  const v = constantValue(s);
   return Number(v.n) / Number(v.d);
 }
+export function constantValue(s: string): Q {
+  const a = affine(parse(s));
+  if (!isConstant(a)) throw new Error('Enter a number or fraction.');
+  return a.get('') || q(0);
+}
+// Shared exact arithmetic for written moves; the proof translator stays independent.
+export const rational = { of: q, add, negate: neg, multiply: mul, divide: div, format: str };
 export function isIsolated(s: string, target: string) {
   try {
     return clauses(s).every((c) => {

@@ -15,6 +15,7 @@ import {
 } from '../../lib/model';
 import { Graph } from './Graph';
 import { ProofPanel } from './ProofPanel';
+import { MathLine } from './MathDisplay';
 import type { Mutation } from './Solver';
 export function DocumentEditor({
   book,
@@ -313,7 +314,12 @@ function Calculation({ expression }: { expression: string }) {
   } catch (e) {
     result = e instanceof Error ? e.message : 'Check the expression.';
   }
-  return <output className="calculation-output">{result}</output>;
+  return (
+    <div>
+      <MathLine text={expression} />
+      <output className="calculation-output">{result}</output>
+    </div>
+  );
 }
 function ScenarioEditor({
   document,

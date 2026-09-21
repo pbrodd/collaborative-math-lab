@@ -34,7 +34,7 @@ _“mathbitch” is another working name. The students still get to choose. The 
 
 - Keep open notebooks with questions, notes, calculations, numerical graphs, and unfinished ideas.
 - Play the Brawl Stars damage-threshold and Rainbow Six Siege timing missions, alone or in a team room. Both use explicitly supplied practice data.
-- Choose **Build**, **Guide**, or **Notebook** help independently for each task. Build applies student-selected operations to both sides; Guide offers parts and hints; Notebook accepts freely written steps.
+- Choose **Build**, **Guide**, or **Notebook** help independently for each task. Build lets students select terms, preview balanced moves, distribute, combine terms, and work on separate absolute-value cases. Guide and Notebook use MathLive for keyboard/touch entry with real fractions and grouping. Steps have undo/redo, and saved drafts include unfinished math entry. See [the algebra editor](docs/algebra-editing.md).
 - Assign role subproblems, publish findings with explanations, approve reasoning or request revisions, and connect the findings into a team challenge.
 - Create scenarios from a blank template, remix a starter or another student's scenario, or construct equations backwards from intended answers.
 - Edit the story, supplied information, data, questions, hints, objectives, constraints, role outputs, and intended solutions. Coauthors can join the same scenario room.

@@ -1,7 +1,9 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { equivalent, transform } from '../../lib/algebra';
-import { type HelpMode, type Work } from '../../lib/missions';
+import { equivalent } from '../../lib/algebra';
+import { emptyEntry, type HelpMode, type Work, type Step } from '../../lib/missions';
+import { MathLine } from './MathDisplay';
+import { EquationEditor } from './EquationEditor';
 import {
   assessTask,
   resolveTask,
@@ -13,18 +15,6 @@ import {
 import { MissionExperiment } from './Graph';
 import { WorkProof } from './ProofPanel';
 export type Mutation = (data: Record<string, unknown>) => Promise<Book>;
-export function MathLine({ text }: { text: string }) {
-  return (
-    <div className="math-line">
-      {text.split(/\s+or\s+/).map((part, i) => (
-        <span key={i}>
-          {i > 0 && <small>or</small>}
-          {part.replace(/\*/g, ' × ').replace(/<=/g, '≤').replace(/>=/g, '≥')}
-        </span>
-      ))}
-    </div>
-  );
-}
 function workFor(book: Book, task: ScenarioTask) {
   return book.contributions.find(
     (c) => c.task_id === (task.kind === 'transfer' ? `${task.id}:private:${book.me}` : task.id),
@@ -219,10 +209,7 @@ function TaskEditor({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [operation, setOperation] = useState('subtract');
-  const [amount, setAmount] = useState('');
-  const [next, setNext] = useState('');
-  const [reason, setReason] = useState('');
+  const [redo, setRedo] = useState<{ key: string; steps: Step[] }>({ key: '', steps: [] });
   const [note, setNote] = useState('');
   const mine = contribution.owner_id === book.me;
   const unresolved = /\{\{/.test(task.equation);
@@ -230,7 +217,12 @@ function TaskEditor({
   const checked = assessTask(task, work);
   const changedRemotely = base !== contribution.revision && dirty;
   const edit = (patch: Partial<Work>) => {
-    setDraft({ work: { ...work, ...patch }, base });
+    // Mathfield input and Enter can arrive in the same React batch. Merge
+    // patches into the latest draft so an input event cannot erase a new step.
+    setDraft((previous) => ({
+      work: { ...(previous?.work ?? contribution.work), ...patch },
+      base: previous?.base ?? contribution.revision,
+    }));
     onDirty(true);
     setMessage('');
     setError('');
@@ -240,9 +232,12 @@ function TaskEditor({
       setError('Keep this solution within 30 steps.');
       return;
     }
-    edit({ steps: [...work.steps, { equation, reason: why }] });
-    setNext('');
-    setReason('');
+    if (equation.length > 240 || why.length > 240) {
+      setError('Keep each equation and operation note within 240 characters.');
+      return;
+    }
+    edit({ steps: [...work.steps, { equation, reason: why }], entry: emptyEntry() });
+    setRedo({ key: '', steps: [] });
   };
   const act = async (action: string, extra: Record<string, unknown> = {}) => {
     setBusy(true);
@@ -413,118 +408,47 @@ function TaskEditor({
         })}
       </div>
       {mine && !unresolved && task.equation && (
-        <div className="step-builder">
-          {work.mode === 'build' ? (
-            <>
-              <p className="builder-label">
-                Apply an operation to <strong>both sides</strong>
-              </p>
-              <div className="build-controls">
-                <select
-                  aria-label="Operation"
-                  value={operation}
-                  onChange={(e) => setOperation(e.target.value)}
-                >
-                  <option value="subtract">Subtract</option>
-                  <option value="add">Add</option>
-                  <option value="divide">Divide by</option>
-                  <option value="multiply">Multiply by</option>
-                  <option value="simplify">Simplify each side</option>
-                  <option value="split">Open absolute-value paths</option>
-                </select>
-                {!['simplify', 'split'].includes(operation) && (
-                  <input
-                    aria-label="Number for the operation"
-                    placeholder="number or fraction"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                  />
-                )}
-                <button
-                  className="button"
-                  disabled={busy}
-                  onClick={() => {
-                    try {
-                      const equation = transform(current, operation, amount);
-                      append(
-                        equation,
-                        operation === 'split'
-                          ? 'Opened every absolute-value path.'
-                          : operation === 'simplify'
-                            ? 'Simplified each side without changing its value.'
-                            : `${operation[0].toUpperCase() + operation.slice(1)} ${amount} on both sides.`,
-                      );
-                    } catch (e) {
-                      setError(e instanceof Error ? e.message : 'Check the operation.');
-                    }
-                  }}
-                >
-                  Apply move →
-                </button>
-              </div>
-              {!['simplify', 'split'].includes(operation) && (
-                <div className="parts" aria-label="Number tiles">
-                  {['2', '3', '4', '6', '8', '14', '200', '1500', '1800'].map((n) => (
-                    <button key={n} onClick={() => setAmount(n)}>
-                      {n}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            <>
-              <label>
-                Next equation
-                <input
-                  className="math-input"
-                  placeholder={`Example: ${task.variable} = …`}
-                  value={next}
-                  onChange={(e) => setNext(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && next.trim()) append(next, reason);
-                  }}
-                />
-              </label>
-              {work.mode === 'guide' && (
-                <div className="parts" aria-label="Equation parts">
-                  {[task.variable, '+', '-', '×', '/', '=', '(', ')', '|', 'or'].map((part) => (
-                    <button
-                      key={part}
-                      onClick={() => setNext((v) => `${v}${part === 'or' ? ' or ' : part}`)}
-                    >
-                      {part}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <label>
-                What did you change?
-                <input
-                  placeholder="I divided both sides by…"
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  maxLength={240}
-                />
-              </label>
-              <button
-                className="button"
-                disabled={!next.trim() || busy}
-                onClick={() => append(next, reason)}
-              >
-                Check and add step →
-              </button>
-            </>
-          )}
-          {work.steps.length > 0 && (
+        <>
+          <EquationEditor
+            key={current}
+            current={current}
+            mode={work.mode}
+            entry={work.entry ?? emptyEntry()}
+            onEntry={(entry) => edit({ entry })}
+            onAppend={append}
+            disabled={busy}
+          />
+          <div className="step-history" role="group" aria-label="Step history">
             <button
               className="text-button"
-              onClick={() => edit({ steps: work.steps.slice(0, -1) })}
+              disabled={busy || !work.steps.length}
+              onClick={() => {
+                const steps = work.steps.slice(0, -1);
+                setRedo({
+                  key: JSON.stringify(steps),
+                  steps: [
+                    work.steps.at(-1)!,
+                    ...(redo.key === JSON.stringify(work.steps) ? redo.steps : []),
+                  ],
+                });
+                edit({ steps });
+              }}
             >
               Undo last step
             </button>
-          )}
-        </div>
+            <button
+              className="text-button"
+              disabled={busy || !redo.steps.length || redo.key !== JSON.stringify(work.steps)}
+              onClick={() => {
+                const steps = [...work.steps, redo.steps[0]];
+                edit({ steps });
+                setRedo({ key: JSON.stringify(steps), steps: redo.steps.slice(1) });
+              }}
+            >
+              Redo step
+            </button>
+          </div>
+        </>
       )}
       {mine && (
         <div className="hint-area">

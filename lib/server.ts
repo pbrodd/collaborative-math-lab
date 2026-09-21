@@ -103,7 +103,19 @@ export function validateWork(value: unknown): Work {
     Object.values(w.answers).some((v) => typeof v !== 'string' || v.length > 100) ||
     typeof w.explanation !== 'string' ||
     w.explanation.length > 3000 ||
-    !['build', 'guide', 'notebook'].includes(w.mode)
+    !['build', 'guide', 'notebook'].includes(w.mode) ||
+    (w.entry !== undefined &&
+      (!w.entry ||
+        typeof w.entry !== 'object' ||
+        typeof w.entry.latex !== 'string' ||
+        w.entry.latex.length > 2000 ||
+        typeof w.entry.amount !== 'string' ||
+        w.entry.amount.length > 2000 ||
+        typeof w.entry.reason !== 'string' ||
+        w.entry.reason.length > 240 ||
+        !['add', 'subtract', 'multiply', 'divide', 'combine', 'distribute', 'split'].includes(
+          w.entry.operation,
+        )))
   )
     throw new ApiError('Keep the solution to 30 short steps and an explanation.');
   return {
@@ -112,6 +124,16 @@ export function validateWork(value: unknown): Work {
     explanation: w.explanation,
     hints: Number.isInteger(w.hints) ? Math.max(0, Math.min(3, w.hints)) : 0,
     mode: w.mode,
+    ...(w.entry
+      ? {
+          entry: {
+            latex: w.entry.latex,
+            reason: w.entry.reason,
+            amount: w.entry.amount,
+            operation: w.entry.operation,
+          },
+        }
+      : {}),
   };
 }
 export async function authorize(db: Database, id: string, session: string) {

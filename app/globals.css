@@ -1362,6 +1362,235 @@ button svg {
   font-family: var(--mono);
   font-size: 13px;
 }
+
+/* Equation working: mathematical notation, deliberate moves, and recoverable drafts. */
+.math-typeset {
+  display: inline-block;
+  font-family: serif;
+  line-height: 1.3;
+}
+.math-source {
+  font-family: var(--mono);
+  overflow-wrap: anywhere;
+}
+.math-line {
+  font-family: serif;
+  font-size: 24px;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 6px 0;
+}
+.math-case {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 4px;
+}
+.math-case > small,
+.selectable-case > small {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.math-cases {
+  align-items: stretch;
+}
+.math-cases .math-case {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  flex: 1 1 180px;
+}
+.equation-editor {
+  display: grid;
+  gap: 16px;
+}
+.equation-editor > .button {
+  justify-self: start;
+}
+.equation-editor label,
+.input-caption {
+  display: grid;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.equation-selection {
+  display: grid;
+  gap: 12px;
+}
+.selectable-case {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  min-width: 0;
+}
+.selectable-relation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.selectable-relation > small {
+  width: 100%;
+  padding: 8px 0;
+}
+.selectable-side {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.relation-sign {
+  font-size: 26px;
+  padding: 0 10px;
+}
+.equation-term {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 48px;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid transparent;
+  border-bottom: 2px dashed #9aab97;
+  border-radius: 6px;
+  padding: 8px;
+  background: transparent;
+  font-size: 24px;
+  color: inherit;
+  cursor: pointer;
+}
+.equation-term:hover,
+.equation-term[aria-pressed='true'] {
+  background: #e9f2e5;
+  border-color: #607d50;
+}
+.equation-term:focus-visible,
+.math-entry-tools button:focus-visible {
+  outline: 3px solid #426936;
+  outline-offset: 3px;
+}
+.term-actions,
+.preview-actions,
+.step-history {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.move-controls {
+  display: grid;
+  gap: 14px;
+}
+.math-input-host {
+  min-height: 58px;
+  margin-top: 6px;
+  min-width: 0;
+}
+math-field {
+  display: block;
+  width: 100%;
+  min-height: 58px;
+  padding: 9px;
+  border: 1px solid #9aab97;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 24px;
+  --caret-color: #365d2b;
+  --selection-background-color: #dfead8;
+  --contains-highlight-background-color: #ecf3e9;
+}
+math-field:focus-within {
+  outline: 2px solid #607d50;
+  outline-offset: 2px;
+}
+math-field::part(menu-toggle) {
+  display: none;
+}
+.math-entry {
+  min-width: 0;
+}
+.math-entry-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.math-entry-tools button {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
+  color: inherit;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.math-entry-tools button:hover {
+  background: #e9f2e5;
+}
+.move-preview {
+  display: grid;
+  gap: 10px;
+  background: #f1f5ed;
+  border: 1px solid #9aab97;
+  border-radius: 10px;
+  padding: 18px;
+  min-width: 0;
+}
+.move-preview .operation-note {
+  margin: 0;
+  font-weight: 600;
+  color: #365d2b;
+}
+.move-preview > .math-line:first-of-type {
+  color: #64418b;
+}
+.inequality-note {
+  border-left: 3px solid #64418b;
+  padding-left: 10px;
+  font-size: 12px;
+}
+.entry-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.entry-status small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.step-history {
+  margin: 14px 0 20px;
+}
+.equation-editor button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (max-width: 600px) {
+  .equation-term,
+  math-field {
+    font-size: 22px;
+  }
+  .selectable-case,
+  .move-preview {
+    padding: 10px;
+  }
+  .preview-actions .button {
+    flex: 1 1 auto;
+  }
+  .math-entry-tools button {
+    min-height: 44px;
+  }
+}
 .hint-area {
   margin: 18px 0 22px;
 }

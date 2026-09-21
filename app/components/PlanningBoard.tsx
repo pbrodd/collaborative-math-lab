@@ -15,6 +15,7 @@ import {
 import { planningSvg, planningDocument } from '../../lib/planning-art';
 import { ProofPanel } from './ProofPanel';
 import type { Mutation } from './Solver';
+import { MathLine } from './MathDisplay';
 
 type Draft = { kind: 'marker' | 'route' | 'settings'; value: PlanObject; base: number | null };
 function saveFile(content: string, filename: string, type: string) {
@@ -671,9 +672,9 @@ export function PlanningBoard({
                       </p>
                     )}
                     <div className="board-equations">
-                      <code>{question.equation}</code>
+                      <MathLine text={question.equation} />
                       {question.constraints.map((c) => (
-                        <code key={c}>{c}</code>
+                        <MathLine key={c} text={c} />
                       ))}
                     </div>
                     <label>

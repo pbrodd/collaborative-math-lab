@@ -10,6 +10,7 @@ The students choose the eventual product name. Algebraica and mathchud are provi
 - A remix keeps attribution and a link to its immediate source. Test-play creates a separate solver workbook and preserves the author’s draft.
 - Cooperative authoring and solving use shared rooms, durable server storage, participant names, role assignments, and conflict-aware writes. Equations, reasons, and revisions remain visible.
 - Build, Guide, and Notebook are help levels, not fixed student ability labels. Preserve multiple valid methods and every absolute-value branch.
+- The lesson algebra editor uses MathLive entry and formatted display, selectable terms, checked operation previews, explicit distribution/collection, individual case controls, and step undo/redo. Saved drafts include unfinished equations. The written working preserves grouping and term order while the exact checker validates solution sets; see [the editing boundary](docs/algebra-editing.md).
 - Author checks distinguish unique solutions, multiple solutions, no solution, and solution regions. Contradictions may be intentional. Unsupported mathematics must be identified rather than guessed.
 - Published role outputs can feed later questions through explicit named references; a changed scenario makes old solver work require review.
 - The two complete introductory missions remain Brawl Stars damage thresholds and Siege arrival timing, using clearly labeled practice data.

@@ -4,12 +4,20 @@ export type HelpMode = 'build' | 'guide' | 'notebook';
 export type Parameters = { health: number; arrival: number; deadline: number };
 export const defaults: Parameters = { health: 6000, arrival: 20, deadline: 21 };
 export type Step = { equation: string; reason: string };
+export type MathEntry = { latex: string; reason: string; amount: string; operation: string };
+export const emptyEntry = (): MathEntry => ({
+  latex: '',
+  reason: '',
+  amount: '',
+  operation: 'subtract',
+});
 export type Work = {
   steps: Step[];
   answers: Record<string, string>;
   explanation: string;
   hints: number;
   mode: HelpMode;
+  entry?: MathEntry;
 };
 export const emptyWork = (): Work => ({
   steps: [],

@@ -9,6 +9,7 @@ import {
   type ProofRequest,
 } from '../../lib/formal';
 import { findReceipt, type ProofReceipt } from '../../lib/proof-receipts';
+import { MathLine } from './MathDisplay';
 import examples from '../../verification/examples.json';
 
 function download(content: string, filename: string, type: string) {
@@ -94,12 +95,12 @@ export function ProofPanel({
         <div className="proof-claim">
           <div>
             <small>Starting relationship</small>
-            <code>{before || 'No relationship yet'}</code>
+            <MathLine text={before || 'No relationship yet'} />
           </div>
           <span aria-label="if and only if">↔</span>
           <div>
             <small>{kind === 'step' ? 'Proposed step' : 'Complete solution'}</small>
-            <code>{after || 'Add a result to inspect'}</code>
+            <MathLine text={after || 'Add a result to inspect'} />
           </div>
         </div>
         {constrained && (

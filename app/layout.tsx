@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { headers } from 'next/headers';
 import { applicationOrigin } from '../lib/origin';
 import './globals.css';
+import 'mathlive/fonts.css';
+import 'mathlive/static.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();
