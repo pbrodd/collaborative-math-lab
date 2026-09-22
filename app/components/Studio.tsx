@@ -196,6 +196,16 @@ function Workspace({
     if (!leave()) return;
     setDialog({ type: 'create', kind, template });
   };
+  const siege =
+    book?.kind === 'play' && book.document.type === 'scenario' && book.document.theme === 'siege';
+  const missionTools = book && (
+    <>
+      <PlanningBoard key={`plan:${book.id}`} book={book} mutate={mutate} onDirty={setBoardDirty} />
+      {book.document.type === 'scenario' && (
+        <MissionCards key={`cards:${book.id}`} book={book} dirty={dirty || boardDirty} />
+      )}
+    </>
+  );
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">
@@ -529,15 +539,7 @@ function Workspace({
                 <span> · Created by {book.creator}</span>
               </div>
             )}
-            <PlanningBoard
-              key={`plan:${book.id}`}
-              book={book}
-              mutate={mutate}
-              onDirty={setBoardDirty}
-            />
-            {book.document.type === 'scenario' && (
-              <MissionCards key={`cards:${book.id}`} book={book} dirty={dirty || boardDirty} />
-            )}
+            {!siege && missionTools}
             {book.kind === 'play' ? (
               <Solver key={book.id} book={book} mutate={mutate} onDirty={setDirty} />
             ) : (
@@ -549,6 +551,7 @@ function Workspace({
                 onTest={() => derive('test')}
               />
             )}
+            {siege && <div className="siege-support-tools">{missionTools}</div>}
           </div>
         )}
       </main>

@@ -4,6 +4,8 @@ import { equivalent } from '../../lib/algebra';
 import { emptyEntry, type HelpMode, type Work, type Step } from '../../lib/missions';
 import { MathLine } from './MathDisplay';
 import { EquationEditor } from './EquationEditor';
+import { SiegeBriefing } from './SiegeBriefing';
+import { siegeSignals } from '../../lib/siege-briefing';
 import {
   assessTask,
   resolveTask,
@@ -47,6 +49,9 @@ function SolverInner({
   const [dirty, setDirty] = useState(false);
   const [panel, setPanel] = useState<'work' | 'team'>('work');
   const [now, setNow] = useState<number | null>(null);
+  const [command, setCommand] = useState(
+    scenario.theme === 'siege' && scenario.appearance !== 'paper',
+  );
   useEffect(() => {
     const tick = () => setNow(Date.now());
     const timer = setInterval(tick, 1000);
@@ -56,9 +61,10 @@ function SolverInner({
   const contribution = workFor(book, task);
   const values = scenarioValues(scenario, book.contributions, false, book.revision);
   const resolved = resolveTask(task, values);
-  const done = scenario.tasks.filter(
-    (t) => t.kind !== 'transfer' && workFor(book, t)?.published,
-  ).length;
+  const done = scenario.tasks.filter((t) => {
+    const finding = workFor(book, t);
+    return t.kind !== 'transfer' && finding?.published && finding.book_revision === book.revision;
+  }).length;
   const roleTasks = scenario.tasks.filter((t) => t.kind !== 'transfer');
   const changeTask = (id: string) => {
     if (dirty && !window.confirm('Leave your unsaved draft? Save it first to keep these changes.'))
@@ -69,122 +75,156 @@ function SolverInner({
     setPanel('work');
   };
   return (
-    <div
-      className={`solver-layout ${scenario.appearance === 'briefing' ? 'briefing-workbook' : ''}`}
-    >
-      <aside className="mission-nav">
-        <span className="eyebrow">YOUR MISSION</span>
-        <h2>{book.title.replace(' · playthrough', '')}</h2>
-        <p>{scenario.story}</p>
-        <div className="progress-line">
-          <span style={{ width: `${(done / Math.max(1, roleTasks.length)) * 100}%` }} />
+    <section className={command ? 'siege-world' : undefined}>
+      {scenario.theme === 'siege' && (
+        <div className="siege-view-switch">
+          <span>{command ? 'MISSION CONTROL' : 'FOCUS VIEW'}</span>
+          <button
+            className="text-button"
+            aria-pressed={command}
+            onClick={() => setCommand(!command)}
+          >
+            {command ? 'Switch to quiet view' : 'Open mission control'}
+          </button>
         </div>
-        <small>
-          {done} of {roleTasks.length} findings published
-        </small>
-        <nav aria-label="Mission tasks">
-          {scenario.tasks.map((t, i) => {
-            const c = workFor(book, t);
-            return (
-              <button
-                key={t.id}
-                className={`task-nav ${task.id === t.id && panel === 'work' ? 'active' : ''}`}
-                onClick={() => changeTask(t.id)}
-              >
-                <span className={`task-number ${c?.published ? 'complete' : ''}`}>
-                  {c?.published ? '✓' : String(i + 1).padStart(2, '0')}
-                </span>
+      )}
+      {command && (
+        <SiegeBriefing
+          title={book.title.replace(' · playthrough', '')}
+          signals={siegeSignals(values)}
+          published={done}
+          total={roleTasks.length}
+          reviewed={
+            roleTasks.filter((t) => {
+              const finding = workFor(book, t);
+              return (
+                finding?.published &&
+                finding.book_revision === book.revision &&
+                finding.reviewer_id &&
+                finding.reviewer_id !== finding.owner_id
+              );
+            }).length
+          }
+        />
+      )}
+      <div
+        id={scenario.theme === 'siege' ? 'siege-workspace' : undefined}
+        className={`solver-layout ${scenario.appearance === 'briefing' ? 'briefing-workbook' : ''}`}
+      >
+        <aside className="mission-nav">
+          <span className="eyebrow">YOUR MISSION</span>
+          <h2>{book.title.replace(' · playthrough', '')}</h2>
+          <p>{scenario.story}</p>
+          <div className="progress-line">
+            <span style={{ width: `${(done / Math.max(1, roleTasks.length)) * 100}%` }} />
+          </div>
+          <small>
+            {done} of {roleTasks.length} findings published
+          </small>
+          <nav aria-label="Mission tasks">
+            {scenario.tasks.map((t, i) => {
+              const c = workFor(book, t);
+              return (
+                <button
+                  key={t.id}
+                  className={`task-nav ${task.id === t.id && panel === 'work' ? 'active' : ''}`}
+                  onClick={() => changeTask(t.id)}
+                >
+                  <span className={`task-number ${c?.published ? 'complete' : ''}`}>
+                    {c?.published ? '✓' : String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span>
+                    <b>{t.role}</b>
+                    <small>
+                      {c?.owner_id
+                        ? book.members.find((m) => m.id === c.owner_id)?.name
+                        : 'Unassigned'}
+                      {c?.reviewer_id ? ' · reviewed' : c?.published ? ' · published' : ''}
+                    </small>
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
+          <button
+            className={`button secondary full ${panel === 'team' ? 'selected' : ''}`}
+            onClick={() => {
+              if (dirty && !window.confirm('Leave the unsaved draft?')) return;
+              setDirty(false);
+              onDirty(false);
+              setPanel('team');
+            }}
+          >
+            Team planning table ↗
+          </button>
+          <details className="mission-assumptions">
+            <summary>Supplied information</summary>
+            <p>{scenario.information}</p>
+            {scenario.data.map((d) => (
+              <div key={d.key}>
+                <code>{d.key}</code> {d.value} {d.unit}
+              </div>
+            ))}
+          </details>
+        </aside>
+        <div className="solver-main">
+          {panel === 'team' ? (
+            <TeamTable book={book} onSelect={changeTask} />
+          ) : contribution ? (
+            <TaskEditor
+              key={`${book.id}:${task.id}`}
+              book={book}
+              task={resolved}
+              definition={task}
+              contribution={contribution}
+              mutate={mutate}
+              onDirty={(v) => {
+                setDirty(v);
+                onDirty(v);
+              }}
+            />
+          ) : (
+            <p>Loading this role’s workspace…</p>
+          )}
+        </div>
+        <aside className="crew-panel">
+          <span className="eyebrow">THE CREW</span>
+          <div className="crew-list">
+            {book.members.map((m) => (
+              <div className="crew-person" key={m.id}>
+                <span className="avatar">{m.name.slice(0, 1).toUpperCase()}</span>
                 <span>
-                  <b>{t.role}</b>
+                  <b>
+                    {m.name}
+                    {m.id === book.me ? ' (you)' : ''}
+                  </b>
                   <small>
-                    {c?.owner_id
-                      ? book.members.find((m) => m.id === c.owner_id)?.name
-                      : 'Unassigned'}
-                    {c?.reviewer_id ? ' · reviewed' : c?.published ? ' · published' : ''}
+                    {now === null
+                      ? 'Checking presence…'
+                      : now - m.last_seen < 20000
+                        ? 'Here now'
+                        : 'Away for now'}
                   </small>
                 </span>
-              </button>
-            );
-          })}
-        </nav>
-        <button
-          className={`button secondary full ${panel === 'team' ? 'selected' : ''}`}
-          onClick={() => {
-            if (dirty && !window.confirm('Leave the unsaved draft?')) return;
-            setDirty(false);
-            onDirty(false);
-            setPanel('team');
-          }}
-        >
-          Team planning table ↗
-        </button>
-        <details className="mission-assumptions">
-          <summary>Supplied information</summary>
-          <p>{scenario.information}</p>
-          {scenario.data.map((d) => (
-            <div key={d.key}>
-              <code>{d.key}</code> {d.value} {d.unit}
-            </div>
-          ))}
-        </details>
-      </aside>
-      <div className="solver-main">
-        {panel === 'team' ? (
-          <TeamTable book={book} onSelect={changeTask} />
-        ) : contribution ? (
-          <TaskEditor
-            key={`${book.id}:${task.id}`}
-            book={book}
-            task={resolved}
-            definition={task}
-            contribution={contribution}
-            mutate={mutate}
-            onDirty={(v) => {
-              setDirty(v);
-              onDirty(v);
-            }}
-          />
-        ) : (
-          <p>Loading this role’s workspace…</p>
-        )}
+                <i
+                  className={
+                    now !== null && now - m.last_seen < 20000 ? 'presence online' : 'presence'
+                  }
+                />
+              </div>
+            ))}
+          </div>
+          <div className="crew-note">
+            <span className="mini-symbol">↗</span>
+            <h3>Good teams show their thinking.</h3>
+            <p>Make a claim. Show the evidence. Invite another pair of eyes.</p>
+          </div>
+          <p className="field-note">
+            Room changes sync about every 3 seconds. Your independent check belongs to you.
+          </p>
+        </aside>
       </div>
-      <aside className="crew-panel">
-        <span className="eyebrow">THE CREW</span>
-        <div className="crew-list">
-          {book.members.map((m) => (
-            <div className="crew-person" key={m.id}>
-              <span className="avatar">{m.name.slice(0, 1).toUpperCase()}</span>
-              <span>
-                <b>
-                  {m.name}
-                  {m.id === book.me ? ' (you)' : ''}
-                </b>
-                <small>
-                  {now === null
-                    ? 'Checking presence…'
-                    : now - m.last_seen < 20000
-                      ? 'Here now'
-                      : 'Away for now'}
-                </small>
-              </span>
-              <i
-                className={
-                  now !== null && now - m.last_seen < 20000 ? 'presence online' : 'presence'
-                }
-              />
-            </div>
-          ))}
-        </div>
-        <div className="crew-note">
-          <span className="mini-symbol">↗</span>
-          <h3>Good teams show their thinking.</h3>
-          <p>Make a claim. Show the evidence. Invite another pair of eyes.</p>
-        </div>
-        <p className="field-note">
-          Room changes sync about every 3 seconds. Your independent check belongs to you.
-        </p>
-      </aside>
-    </div>
+    </section>
   );
 }
 function TaskEditor({

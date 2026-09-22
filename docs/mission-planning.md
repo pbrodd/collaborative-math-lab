@@ -53,7 +53,7 @@ Chained objectives introduce a natural optional extension: the next stage cannot
 
 ## Workbook ownership and presentation
 
-Keep the current paper style and original briefing style as choices. Extend them with student-authored operation titles, call signs, covers, readable palettes, document stamps, and original squad emblems. The presentation should resemble a briefing document without copying a game's visual assets. Other students may prefer a lab journal or a Brawl-inspired strategy notebook.
+Keep the current paper style and original briefing style as choices. The September 21 feedback establishes a more theatrical next direction: a full operations-room experience with a luminous map, animated mission objects, squad readouts, and readiness lights that respond to the student's calculations. Add student-authored operation titles, call signs, and original squad emblems. Other worlds should have their own visual language and interactions, including an arena, stadium, creature expedition, lemonade stand, or bracelet workshop. See [the theme and younger-student quest direction](themes-and-quests.md) for the feedback, proposed experiences, and implementation boundary.
 
 Style travels with the workbook through save, edit, remix, export, and test-play. Maintain a readable print style, adequate contrast, visible focus, and a plain presentation option. All Build/Guide/Notebook help modes remain available regardless of theme. A presentation change should eventually have its own revision so it does not invalidate mathematical reviews unnecessarily; the current document revision mechanism remains conservative.
 
